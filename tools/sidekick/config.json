@@ -4,14 +4,13 @@
   "editUrlPattern": "{{contentSourceUrl}}{{pathname}}?cmd=open",
   "plugins": [
     {
-      "id": "review",
-      "title": "Review...",
-      "environments": ["*"],
-      "url": "https://tools.aem.live/tools/snapshot-admin/popover.html",
-      "isPopover": true,
-      "popoverRect": "width:400px; height:400px",
-      "passConfig": true,
-      "passReferrer": true
-    }
+  "id": "test-plugin",
+  "title": "Test Button",
+  "environments": ["*"],
+  "url": "https://tools.aem.live/tools/snapshot-admin/snapshot-plugin.js",
+  "isPopover": false,
+  "passConfig": true,
+  "passReferrer": true
+}
   ]
 }
