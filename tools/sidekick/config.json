@@ -6,8 +6,7 @@
     {
   "id": "test-plugin",
   "title": "Test Button",
-  "environments": ["*"],
-  "url": "https://tools.aem.live/tools/snapshot-admin/snapshot-plugin.js",
+  "url": "https://tools.aem.live/tools/sidekick/plugins/snapshot-admin",
   "isPopover": false,
   "passConfig": true,
   "passReferrer": true
