@@ -12,7 +12,7 @@ indices:
         select: none
         value: parseTimestamp(headers["last-modified"], "ddd, DD MMM YYYY hh:mm:ss GMT")
       title : 
-        select : div h1
+        select : div h1, h3
         value : textContent
       subheader_x:
         select : div h3#x
