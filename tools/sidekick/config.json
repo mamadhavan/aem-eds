@@ -1,11 +1,11 @@
 {
-  "project": "AEM XWalk Boilerplate",
+  "project": "AEM EDS Demo",
   "editUrlLabel": "AEM Editor",
   "editUrlPattern": "{{contentSourceUrl}}{{pathname}}?cmd=open",
   "plugins": [
     {
       "id": "review",
-      "title": "Review...",
+      "title": "Snap Review...",
       "url": "https://tools.aem.live/tools/snapshot-admin/popover.html",
       "isPopover": true,
       "popoverRect": "width:400px; height:400px",
