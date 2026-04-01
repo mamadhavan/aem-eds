@@ -11,6 +11,12 @@ indices:
       lastModified:
         select: none
         value: parseTimestamp(headers["last-modified"], "ddd, DD MMM YYYY hh:mm:ss GMT")
+      title : 
+        select : h1
+        value : textContent
+      subheader_x:
+        select : h3#x
+        value : textContent
       robots:
         select: head > meta[name="robots"]
         value: attribute(el, "content")
