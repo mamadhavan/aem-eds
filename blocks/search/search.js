@@ -15,6 +15,7 @@ export default async function decorate(block) {
   const resp = await fetch('/query-index.json');
   const data = await resp.json();
 
+  // Suggestion logic
   input.addEventListener('input', function() {
     const query = input.value.toLowerCase();
 
@@ -29,11 +30,12 @@ export default async function decorate(block) {
 
     suggestionsEl.innerHTML = matches.map(function(p) {
       return '<div class="suggestion-item" data-path="' + p.path + '">'
-             + p.title
-             + '</div>';
+           + p.title
+           + '</div>';
     }).join('');
   });
 
+  // Click on suggestion
   suggestionsEl.addEventListener('click', function(e) {
     const item = e.target.closest('.suggestion-item');
     if (item) {
@@ -41,7 +43,7 @@ export default async function decorate(block) {
     }
   });
 
-  // 🔹 Full search on Enter
+  // Full search on Enter
   input.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
       const query = input.value.toLowerCase();
