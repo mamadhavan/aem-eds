@@ -14,9 +14,6 @@ indices:
       title:
         select: meta[property="og:title"]
         value: attribute(content)
-      subheader_x:
-        select : div h3#x
-        value : textContent
       robots:
         select: head > meta[name="robots"]
         value: attribute(el, "content")
