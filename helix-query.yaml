@@ -3,9 +3,14 @@ version: 1
 indices:
   pages:
     include:
-      - '/contactUs/**'
-    target: query-index.json
+      - '/**'
+    exclude:
+      - '/**.json'
+    target: /query-index.json
     properties:
-      title:
-        select: meta[property="og:title"]
-        value: attribute(content)
+      lastModified:
+        select: none
+        value: parseTimestamp(headers["last-modified"], "ddd, DD MMM YYYY hh:mm:ss GMT")
+      robots:
+        select: head > meta[name="robots"]
+        value: attribute(el, "content")
