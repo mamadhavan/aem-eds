@@ -17,3 +17,6 @@ indices:
       twittertitletest:
         select: head > meta[property="twitter:title"]
         value: attribute(el, "content")
+      title:
+        select: head > meta[property="org:title"]
+        value: attribute(el, "content")
