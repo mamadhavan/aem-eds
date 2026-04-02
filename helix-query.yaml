@@ -3,9 +3,7 @@ version: 1
 indices:
   pages:
     include:
-      - '/**'
-    exclude:
-      - '/**.json'
+      - '/contactUs/**'
     target: query-index.json
     properties:
       title:
