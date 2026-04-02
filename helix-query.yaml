@@ -18,6 +18,6 @@ indices:
         value: |
           attribute(el, 'content')
       title:
-        select: head > meta[name="title"]
+        select: head > meta[property="title"]
         value: |
           attribute(el, 'content')
