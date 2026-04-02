@@ -13,10 +13,13 @@ indices:
         value: parseTimestamp(headers["last-modified"], "ddd, DD MMM YYYY hh:mm:ss GMT")
       robots:
         select: head > meta[name="robots"]
-        value: attribute(el, "content")
+        value: |
+          attribute(el, "content")
       twittertitletest:
         select: head > meta[property="twitter:title"]
-        value: attribute(el, "content")
+        value: |
+          attribute(el, "content")
       title:
         select: head > meta[property="org:title"]
-        value: attribute(el, "content")
+        value: |
+          attribute(el, "content")
