@@ -8,12 +8,7 @@ indices:
       - '/**.json'
     target: /query-index.json
     properties:
-      lastModified:
-        select: none
-        value: parseTimestamp(headers["last-modified"], "ddd, DD MMM YYYY hh:mm:ss GMT")
       title:
         select: meta[property="og:title"]
         value: attribute(content)
-      robots:
-        select: head > meta[name="robots"]
-        value: attribute(el, "content")
+    
