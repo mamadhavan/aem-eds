@@ -1,67 +1,99 @@
 export default async function decorate(block) {
   // Create UI
-  block.innerHTML = `
-    <div class="search-box">
-      <input type="text" placeholder="Search..." />
-      <div class="suggestions"></div>
-      <div class="results"></div>
-    </div>
-  `;
+  block.innerHTML =
+    '<div class="search-box">' +
+      '<input type="text" placeholder="Search..." />' +
+      '<div class="suggestions"></div>' +
+      '<div class="results"></div>' +
+    '</div>';
 
-  const input = block.querySelector('input');
-  const suggestionsEl = block.querySelector('.suggestions');
-  const resultsEl = block.querySelector('.results');
+  var input = block.querySelector('input');
+  var suggestionsEl = block.querySelector('.suggestions');
+  var resultsEl = block.querySelector('.results');
 
-  // Fetch index
-  const resp = await fetch('/query-index.json');
-  const data = await resp.json();
+  var data = [];
 
-  // 🔹 Autocomplete
-  input.addEventListener('input', () => {
-    const query = input.value.toLowerCase();
+  // ✅ Fetch index safely
+  try {
+    var resp = await fetch('/query-index.json');
+    var json = await resp.json();
+
+    // Handle both formats: [] or { data: [] }
+    if (Array.isArray(json)) {
+      data = json;
+    } else if (json && Array.isArray(json.data)) {
+      data = json.data;
+    } else {
+      data = [];
+    }
+  } catch (e) {
+    console.error('Error loading query index:', e);
+    return;
+  }
+
+  // 🔹 Autocomplete suggestions
+  input.addEventListener('input', function () {
+    var query = input.value.toLowerCase();
 
     if (!query) {
       suggestionsEl.innerHTML = '';
       return;
     }
 
-    const matches = data.filter(page =>
-      page.title?.toLowerCase().includes(query)
-    ).slice(0, 5); // limit suggestions
+    var matches = data.filter(function (page) {
+      var title = page.title || '';
+      return title.toLowerCase().indexOf(query) !== -1;
+    }).slice(0, 5);
 
-    suggestionsEl.innerHTML = matches.map(p => `
-      <div class="suggestion-item" data-path="${p.path}">
-        ${p.title}
-      </div>
-    `).join('');
+    var html = '';
+    for (var i = 0; i < matches.length; i++) {
+      var p = matches[i];
+      html +=
+        '<div class="suggestion-item" data-path="' + (p.path || '#') + '">' +
+        (p.title || 'No title') +
+        '</div>';
+    }
+
+    suggestionsEl.innerHTML = html;
   });
 
   // 🔹 Click suggestion
-  suggestionsEl.addEventListener('click', (e) => {
-    const item = e.target.closest('.suggestion-item');
-    if (item) {
-      window.location.href = item.dataset.path;
+  suggestionsEl.addEventListener('click', function (e) {
+    var item = e.target.closest('.suggestion-item');
+    if (item && item.getAttribute('data-path')) {
+      window.location.href = item.getAttribute('data-path');
     }
   });
 
   // 🔹 Full search on Enter
-  input.addEventListener('keydown', (e) => {
+  input.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
-      const query = input.value.toLowerCase();
+      var query = input.value.toLowerCase();
 
-      const results = data.filter(page =>
-        page.title?.toLowerCase().includes(query) ||
-        page.description?.toLowerCase().includes(query)
-      );
+      var results = data.filter(function (page) {
+        var title = page.title || '';
+        var desc = page.description || '';
 
-      resultsEl.innerHTML = results.map(p => `
-        <div class="result">
-          <a href="${p.path}">
-            <h3>${p.title}</h3>
-            <p>${p.description || ''}</p>
-          </a>
-        </div>
-      `).join('');
+        return (
+          title.toLowerCase().indexOf(query) !== -1 ||
+          desc.toLowerCase().indexOf(query) !== -1
+        );
+      });
+
+      var html = '';
+      for (var i = 0; i < results.length; i++) {
+        var p = results[i];
+
+        html +=
+          '<div class="result">' +
+            '<a href="' + (p.path || '#') + '">' +
+              '<h3>' + (p.title || 'No title') + '</h3>' +
+              '<p>' + (p.description || '') + '</p>' +
+            '</a>' +
+          '</div>';
+      }
+
+      resultsEl.innerHTML = html;
     }
   });
 }
