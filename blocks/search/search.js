@@ -1,11 +1,19 @@
 export default async function decorate(block) {
+  // Helper to create HTML elements
+  const html = (tag, attrs = {}, content = '') => {
+    const attrString = Object.keys(attrs)
+      .map((key) => ' ' + key + '="' + attrs[key] + '"')
+      .join('');
+    return '<' + tag + attrString + '>' + content + '</' + tag + '>';
+  };
+
   // Create UI
   block.innerHTML =
-    '<div class="search-box">' +
-    '  <input type="text" placeholder="Search..." />' +
-    '  <div class="suggestions"></div>' +
-    '  <div class="results"></div>' +
-    '</div>';
+    html('div', { class: 'search-box' },
+      html('input', { type: 'text', placeholder: 'Search...' }) +
+      html('div', { class: 'suggestions' }) +
+      html('div', { class: 'results' })
+    );
 
   const input = block.querySelector('input');
   const suggestionsEl = block.querySelector('.suggestions');
@@ -29,9 +37,7 @@ export default async function decorate(block) {
       .slice(0, 5);
 
     suggestionsEl.innerHTML = matches
-      .map((p) =>
-        '<div class="suggestion-item" data-path="' + p.path + '">' + p.title + '</div>'
-      )
+      .map((p) => html('div', { class: 'suggestion-item', 'data-path': p.path }, p.title))
       .join('');
   };
 
@@ -61,18 +67,12 @@ export default async function decorate(block) {
       resultsEl.innerHTML = results
         .map(
           (p) =>
-            '<div class="result">' +
-            '<a href="' +
-            p.path +
-            '">' +
-            '<h3>' +
-            p.title +
-            '</h3>' +
-            '<p>' +
-            (p.description || '') +
-            '</p>' +
-            '</a>' +
-            '</div>'
+            html('div', { class: 'result' },
+              html('a', { href: p.path },
+                html('h3', {}, p.title) +
+                html('p', {}, p.description || '')
+              )
+            )
         )
         .join('');
     }
