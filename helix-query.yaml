@@ -11,4 +11,3 @@ indices:
       title:
         select: meta[property="og:title"]
         value: attribute(content)
-    
