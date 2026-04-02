@@ -14,6 +14,6 @@ indices:
       robots:
         select: head > meta[name="robots"]
         value: attribute(el, "content")
-      twittertitle:
-        select: meta[property="twitter:title"]
-        value: attribute(content)
+      twittertitletest:
+        select: head > meta[property="twitter:title"]
+        value: attribute(el, "content")
