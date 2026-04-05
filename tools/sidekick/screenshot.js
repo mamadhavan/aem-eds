@@ -1,17 +1,17 @@
 /**
  * Captures a screenshot of the current page and downloads it.
  */
-export async function takeScreenshot() {
-  // Load html2canvas dynamically to keep the initial bundle small
-  const html2canvas = (await import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.esm.js')).default;
-  
+export default async function takeScreenshot() {
+  const url = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.esm.js';
+  /* eslint-disable-next-line import/no-unresolved */
+  const html2canvas = (await import(url)).default;
+
   const body = document.querySelector('body');
   const canvas = await html2canvas(body, {
-    useCORS: true, // Necessary if you have images from different domains
+    useCORS: true,
     logging: false,
   });
 
-  // Create a download link
   const link = document.createElement('a');
   link.download = `screenshot-${new Date().getTime()}.png`;
   link.href = canvas.toDataURL('image/png');
