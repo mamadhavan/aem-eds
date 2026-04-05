@@ -156,5 +156,4 @@ window.addEventListener('screenshot-trigger', async () => {
     console.error('Failed to load or run screenshot script:', e);
   }
 });
-
 loadPage();
