@@ -1,23 +1,19 @@
 /**
-* Captures a screenshot of the current page and downloads it.
-*/
+ * Captures a screenshot of the current page and downloads it.
+ */
 export async function takeScreenshot() {
- // 1. Dynamic import of html2canvas to keep the site fast
- const { default: html2canvas } = await import('https://jspm.dev/html2canvas');
- // 2. Options to handle AEM EDS specific needs (like CORS for images)
- const options = {
-   useCORS: true,
-   allowTaint: true,
-   scrollY: -window.scrollY, // Ensures it captures from the top of the page
-   ignoreElements: (el) => el.classList.contains('hlx-sidekick'), // Hide sidekick in screenshot
- };
- const canvas = await html2canvas(document.body, options);
- // 3. Create a download link
- const link = document.createElement('a');
- link.download = `preview-${new Date().toISOString().slice(0, 10)}.png`;
- link.href = canvas.toDataURL('image/png');
- link.click();
+  // Load html2canvas dynamically to keep the initial bundle small
+  const html2canvas = (await import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.esm.js')).default;
+  
+  const body = document.querySelector('body');
+  const canvas = await html2canvas(body, {
+    useCORS: true, // Necessary if you have images from different domains
+    logging: false,
+  });
+
+  // Create a download link
+  const link = document.createElement('a');
+  link.download = `screenshot-${new Date().getTime()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
 }
-// Ensure the function is available to the Sidekick
-window.hlx = window.hlx || {};
-window.hlx.takeScreenshot = takeScreenshot;
