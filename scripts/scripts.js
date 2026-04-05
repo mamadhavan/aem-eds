@@ -147,8 +147,8 @@ async function loadPage() {
 
 // Listen for the custom Sidekick event
 window.addEventListener('screenshot-trigger', async () => {
- const { takeScreenshot } = await import('../tools/sidekick/screenshot.js');
- await takeScreenshot();
+  const { takeScreenshot } = await import('../tools/sidekick/screenshot.js');
+  await takeScreenshot();
 });
 
 loadPage();
