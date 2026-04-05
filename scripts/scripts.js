@@ -151,6 +151,7 @@ window.addEventListener('screenshot-trigger', async () => {
   try {
   const { takeScreenshot } = await import('../tools/sidekick/screenshot.js');
   await takeScreenshot();
+  }
   catch(e){
     console.error('Failed to load or run screenshot script:', e);
   }
