@@ -11,5 +11,11 @@
       "popoverRect": "width:400px; height:400px",
       "passConfig": true,
       "passReferrer": true
-    }]
+    },
+    {
+     "id": "screenshot",
+     "title": "Take Screenshot",
+     "environments": ["preview"],
+     "event": "screenshot-trigger"
+   }]
 }
