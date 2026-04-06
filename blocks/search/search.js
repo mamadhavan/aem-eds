@@ -45,7 +45,7 @@ export default async function decorate(block) {
   // Fetch index (cached at the edge)
   const resp = await fetch('/query-index.json');
   const json = await resp.json();
-  const data = json.data;
+  const { data } = json;
 
   input.addEventListener('input', () => {
     const query = input.value.toLowerCase().trim();
@@ -61,7 +61,7 @@ export default async function decorate(block) {
       .sort((a, b) => b.score - a.score);
 
     // Render Autocomplete Suggestions (Top 5)
-    suggestions.innerHTML = scored.slice(0, 5).map(s => `<li>${s.title}</li>`).join('');
+    suggestions.innerHTML = scored.slice(0, 5).map((s) => `<li>${s.title}</li>`).join('');
     suggestions.classList.toggle('visible', scored.length > 0);
 
     // Handle suggestion click
