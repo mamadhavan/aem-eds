@@ -17,7 +17,7 @@
   margin-top: 0.5rem;
   background: #fff;
   border: 1px solid #eee;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
 }
 
 .search-results li a {

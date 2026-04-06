@@ -145,14 +145,3 @@ async function loadPage() {
   loadDelayed();
 }
 
-// Listen for the custom Sidekick event
-window.addEventListener('screenshot-trigger', async () => {
-  console.log('Sidekick event received!');
-  try {
-    const { takeScreenshot } = await import('../tools/sidekick/screenshot.js');
-    await takeScreenshot();
-  } catch (e) {
-    console.error('Failed to load or run screenshot script:', e);
-  }
-});
-loadPage();
