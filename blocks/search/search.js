@@ -2,7 +2,6 @@ async function searchSite(query) {
   // EDS automatically generates this index at the root
   const resp = await fetch('/query-index.json');
   const json = await resp.json();
-  
   return json.data.filter((post) => {
     const text = `${post.title} ${post.description}`.toLowerCase();
     return text.includes(query.toLowerCase());
@@ -29,7 +28,7 @@ export default function decorate(block) {
 
     const results = await searchSite(query);
     resultsContainer.innerHTML = results
-      .map(res => `<li><a href="${res.path}">${res.title}</a></li>`)
+      .map((res) => `<li><a href="${res.path}">${res.title}</a></li>`)
       .join('');
   });
 }
