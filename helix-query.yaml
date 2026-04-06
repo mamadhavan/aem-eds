@@ -17,6 +17,10 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, 'content')
+      weight:
+        select: path
+        value: |
+          match(el, '^/footer/.*') ? 100 : (match(el, '^/blog/.*') ? 50 : 10)
       title:
         select: head > meta[property="og:title"]
         value: |
