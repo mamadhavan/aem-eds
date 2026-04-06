@@ -214,5 +214,18 @@
         "valueType": "string"
       }
     ]
+  },
+  {
+    "id": "search",
+    "fields": [
+      {
+        "component": "text-input",
+        "name": "placeholder",
+        "label": "Search Placeholder",
+        "value": "Search the site..."
+      }
+    ],
+    "groups": ["Content"],
+    "title": "Search Block"
   }
 ]
