@@ -5,16 +5,17 @@
   "plugins": [
     {
       "id": "review",
-      "title": "Snap Review...",
+      "title": "Snap Review1...",
       "url": "https://tools.aem.live/tools/snapshot-admin/popover.html",
       "isPopover": true,
       "popoverRect": "width:400px; height:400px",
       "passConfig": true,
-      "passReferrer": true
+      "passReferrer": true,
+      "environments": ["preview", "live", "development"]
     },
     {
      "id": "screenshot",
-     "title": "Take Screenshot",
+     "title": "Take Screenshot 1",
      "environments": ["preview"],
      "event": "screenshot-trigger"
    }]
