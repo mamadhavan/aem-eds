@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 (async () => {
   const url = process.argv[2] || 'http://localhost:3000';
 
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({ headless: 'new' });
   const page = await browser.newPage();
 
   console.log(`Analyzing: ${url}`);
