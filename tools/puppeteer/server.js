@@ -14,4 +14,9 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(8080, () => console.log('Puppeteer Bridge running on http://localhost:8080'));
+// tools/puppeteer/server.js
+const PORT = 3030; // Change this to your preferred port
+
+server.listen(PORT, () => {
+  console.log(`Puppeteer Bridge active on http://localhost:${PORT}`);
+});

@@ -14,11 +14,11 @@
       "environments": ["preview", "live", "development"]
     },
     {
-     "id": "screenshot",
-     "title": "Take Screenshot 2",
-     "environments": ["preview"],
-     "event": "screenshot-trigger"
-   },
+      "id": "screenshot",
+      "title": "📸 Screenshot",
+      "event": "screenshot",
+      "environments": ["dev", "preview"]
+    },
     {
       "id": "puppeteer-audit",
       "title": "Puppeteer Audit",
