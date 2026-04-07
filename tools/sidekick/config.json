@@ -15,8 +15,17 @@
     },
     {
      "id": "screenshot",
-     "title": "Take Screenshot 1",
+     "title": "Take Screenshot 2",
      "environments": ["preview"],
      "event": "screenshot-trigger"
-   }]
+   },
+    {
+      "id": "puppeteer-audit",
+      "title": "Puppeteer Audit",
+      "containerId": "tools",
+      "environments": ["preview", "live", "development"],
+      "event": "click",
+      "action": "async (el, sk) => { const url = window.location.href; fetch(`http://localhost:8080?url=${url}`).then(() => alert('Running!')).catch(() => alert('Server off')); }"
+    }
+  ]
 }

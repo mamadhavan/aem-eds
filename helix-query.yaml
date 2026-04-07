@@ -17,9 +17,6 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, 'content')
-      weight:
-        select: path
-        value: 10
       title:
         select: head > meta[property="og:title"]
         value: |
