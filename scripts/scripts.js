@@ -145,4 +145,18 @@ async function loadPage() {
   loadDelayed();
 }
 
+/**
+ * Listener for Sidekick custom plugins
+ */
+window.addEventListener('sidekick-ready', () => {
+  const sk = document.querySelector('aem-sidekick');
+  sk.addEventListener('custom', (e) => {
+    // Check if the event matches the ID from your config.json
+    if (e.detail.id === 'hello-plugin') {
+      alert('Hello! This is your custom Sidekick plugin working.');
+      console.log('Sidekick said hello!');
+    }
+  });
+}, { once: true });
+
 loadPage();

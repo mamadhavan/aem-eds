@@ -27,7 +27,12 @@
       "event": "click",
       "action": "async (el, sk) => { const url = window.location.href; fetch(`http://localhost:8080?url=${url}`).then(() => alert('Running!')).catch(() => alert('Server off')); }"
     },
-    "/tools/sidekick/plugins.js"
+    {
+      "id": "hello-plugin",
+      "title": "Say Hello",
+      "event": "say-hello",
+      "environments": ["preview", "dev"]
+    }
   ]
 }
 
