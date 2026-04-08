@@ -10,9 +10,7 @@ export default function (sidekick) {
         sidekick.location?.href || window.location.href;
 
       try {
-        const apiUrl = `https://runtime.adobe.io/api/v1/web/.../screenshot?url=${encodeURIComponent(
-          currentUrl,
-        )}`;
+       const apiUrl = `https://42794-aemedsss-stage.adobeio-static.net/api/v1/web/aem-eds-ss/screenshot?url=${encodeURIComponent(currentUrl)}`;
 
         const response = await fetch(apiUrl);
         const base64 = await response.text();
