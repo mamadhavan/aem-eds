@@ -162,26 +162,5 @@ if (sk) {
   }, { once: true });
 }
 
-function registerSidekickPlugin() {
-  const sk = document.querySelector('aem-sidekick');
-
-  const handleCustomEvent = (e) => {
-    if (e.detail.id === 'hello-plugin') {
-      alert('Hello! The connection is now active.');
-    }
-  };
-
-  if (sk) {
-    // If sidekick is already in the DOM
-    sk.addEventListener('custom', handleCustomEvent);
-  } else {
-    // If sidekick hasn't loaded yet, wait for the official ready event
-    window.addEventListener('sidekick-ready', () => {
-      document.querySelector('aem-sidekick').addEventListener('custom', handleCustomEvent);
-    }, { once: true });
-  }
-}
-
-registerSidekickPlugin();
 
 loadPage();
