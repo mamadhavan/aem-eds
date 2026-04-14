@@ -145,7 +145,7 @@ async function loadPage() {
   loadDelayed();
 }
 
-/async function initCustomSidekickActions() {
+async function initCustomSidekickActions() {
    // 1. Listen for the specific event defined in your config.json
    window.addEventListener('custom:hello', () => {
      alert('Hello!');
