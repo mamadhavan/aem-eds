@@ -1,4 +1,4 @@
-import * as htmlToImage from 'https://cdn.skypack.dev/html-to-image';
+/* eslint-disable no-console */
 
 /**
  * Prepares the page by forcing all lazy-loaded images to load immediately.
@@ -6,12 +6,16 @@ import * as htmlToImage from 'https://cdn.skypack.dev/html-to-image';
 async function prepareImages() {
   const images = document.querySelectorAll('img[loading="lazy"]');
   images.forEach((img) => {
-    img.loading = 'eager';
-    img.fetchPriority = 'high';
+    const image = img;
+    image.loading = 'eager';
+    image.fetchPriority = 'high';
   });
 
-  // Wait a moment for the browser to decode the images
-  return new Promise((resolve) => setTimeout(resolve, 800));
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 800);
+  });
 }
 
 /**
@@ -21,15 +25,16 @@ async function takeFullPageScreenshot() {
   const root = document.querySelector('main');
   if (!root) return;
 
-  // Show visual feedback
   document.body.style.cursor = 'wait';
 
   try {
-    // We use toPng with specific EDS-friendly options
+    // Dynamic import to bypass the "Unable to resolve path" build error
+    const htmlToImage = await import('https://cdn.skypack.dev/html-to-image');
+    
     const dataUrl = await htmlToImage.toPng(root, {
-      cacheBust: true,      // Essential for CORS issues
-      skipFonts: true,      // Speeds up processing
-      bgcolor: '#ffffff',   // Prevents transparent backgrounds
+      cacheBust: true,
+      skipFonts: true,
+      bgcolor: '#ffffff',
       style: {
         transform: 'none',
       },
@@ -52,7 +57,6 @@ async function takeFullPageScreenshot() {
 export default function initSidekickActions() {
   const setupListener = (sidekick) => {
     sidekick.addEventListener('custom:hello', async () => {
-      console.log('Preparing page for screenshot...');
       await prepareImages();
       await takeFullPageScreenshot();
     });
