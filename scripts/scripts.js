@@ -11,6 +11,7 @@ import {
   loadSections,
   loadCSS,
 } from './aem.js';
+import initSidekickActions from './sidekick-actions.js';
 
 /**
  * Moves all the attributes from a given elmenet to another given element.
@@ -127,6 +128,7 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
+  initSidekickActions();
 }
 
 /**

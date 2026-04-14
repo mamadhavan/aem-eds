@@ -34,8 +34,8 @@
       "environments": ["preview", "dev"]
     },
     {
-      "id": "hello",
-      "title": "Say Hello1",
+      "id": "screenshot",
+      "title": "Take Screenshot1",
       "event": "hello"
     }
   ]
