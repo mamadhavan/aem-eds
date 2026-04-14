@@ -146,23 +146,18 @@ async function loadPage() {
 }
 
 async function initCustomSidekickActions() {
-   // 1. Listen for the specific event defined in your config.json
-   window.addEventListener('custom:hello', () => {
-     alert('Hello!');
-   });
+  const sk = document.querySelector('aem-sidekick');
+  const sayHello = () => {
+    alert('Hello!');
+  };
 
-   // 2. Ensure the Sidekick is ready to relay events
-   const sk = document.querySelector('aem-sidekick');
-   if (sk) {
-     sk.addEventListener('custom:hello', () => alert('Hello!'));
-   } else {
-     // If not loaded yet, wait for the 'sidekick-ready' event
-     window.addEventListener('sidekick-ready', () => {
-       const sidekick = document.querySelector('aem-sidekick');
-       sidekick.addEventListener('custom:hello', () => alert('Hello!'));
-     }, { once: true });
-   }
- }
-
- initCustomSidekickActions();
+  if (sk) {
+    sk.addEventListener('custom:hello', sayHello);
+  } else {
+    document.addEventListener('sidekick-ready', () => {
+      document.querySelector('aem-sidekick').addEventListener('custom:hello', sayHello);
+    }, { once: true });
+  }
+}
+initCustomSidekickActions();
 loadPage();
