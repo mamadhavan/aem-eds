@@ -35,9 +35,8 @@
     },
     {
       "id": "hello",
-      "title": "Say Hello world",
-      "event": "custom:hello",
-      "host": true
+      "title": "Say Hello1",
+      "event": "hello"
     }
   ]
 }

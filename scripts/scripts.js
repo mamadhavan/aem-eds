@@ -145,18 +145,24 @@ async function loadPage() {
   loadDelayed();
 }
 
-/**
- * Listener for Sidekick Custom Events
- */
-window.addEventListener('message', (e) => {
-  // Check if the message is coming from the sidekick
-  if (e.data && e.data.type === 'custom:hello') {
-    alert('Hello!');
-  }
-});
+async function initSidekickHello() {
+  const setupListener = (sidekick) => {
+    // We listen for 'custom:hello' because EDS prefixes custom events
+    sidekick.addEventListener('custom:hello', () => {
+      alert('Hello!');
+    });
+  };
 
-// Fallback: Direct event listener
-window.addEventListener('custom:hello', () => {
-  alert('Hello!');
-});
+  const sk = document.querySelector('aem-sidekick');
+  if (sk) {
+    // Case 1: Sidekick is already there
+    setupListener(sk);
+  } else {
+    // Case 2: Wait for Sidekick to load, then attach
+    document.addEventListener('sidekick-ready', () => {
+      setupListener(document.querySelector('aem-sidekick'));
+    }, { once: true });
+  }
+}
+initSidekickHello();
 loadPage();
