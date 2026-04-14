@@ -4,9 +4,6 @@
  */
 async function prepareImages() {
   const images = [...document.querySelectorAll('main img')];
-  
-  // 1. Fixed "iterators/generators" & "loops should be avoided": Using .map instead of for...of
-  // 2. Fixed "Unexpected await inside a loop": Creating an array of promises to run in parallel
   const promises = images.map((img) => {
     const image = img;
     image.loading = 'eager';
@@ -16,7 +13,6 @@ async function prepareImages() {
     if (picture) {
       const source = picture.querySelector('source');
       if (source && source.srcset) {
-        // 3. Fixed "Use array destructuring": Extracting first URL from srcset
         const [firstSrc] = source.srcset.split(' ');
         image.src = firstSrc;
       }
@@ -36,7 +32,7 @@ async function prepareImages() {
 }
 
 /**
- * Captures the page and uploads to DAM
+ * Captures the page and downloads the result.
  */
 async function takeFullPageScreenshot() {
   const root = document.body;
@@ -59,10 +55,6 @@ async function takeFullPageScreenshot() {
 
     if (sidekick) sidekick.style.display = 'block';
 
-    // To upload to DAM:
-    // await uploadToDAM(canvas); 
-    
-    // To download (for local testing):
     const link = document.createElement('a');
     link.download = `screenshot-${Date.now()}.png`;
     link.href = canvas.toDataURL('image/png');
