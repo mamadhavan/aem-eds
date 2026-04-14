@@ -34,10 +34,10 @@
       "environments": ["preview", "dev"]
     },
     {
-      "id": "say-hi",
-      "title": "Say Hi",
-      "event": "say-hi-event",
-      "environments": ["preview", "dev"]
+      "id": "hello",
+      "title": "Say Hello world",
+      "event": "custom:hello",
+      "host": true
     }
   ]
 }

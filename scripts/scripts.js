@@ -145,19 +145,18 @@ async function loadPage() {
   loadDelayed();
 }
 
-async function initCustomSidekickActions() {
-  const sk = document.querySelector('aem-sidekick');
-  const sayHello = () => {
+/**
+ * Listener for Sidekick Custom Events
+ */
+window.addEventListener('message', (e) => {
+  // Check if the message is coming from the sidekick
+  if (e.data && e.data.type === 'custom:hello') {
     alert('Hello!');
-  };
-
-  if (sk) {
-    sk.addEventListener('custom:hello', sayHello);
-  } else {
-    document.addEventListener('sidekick-ready', () => {
-      document.querySelector('aem-sidekick').addEventListener('custom:hello', sayHello);
-    }, { once: true });
   }
-}
-initCustomSidekickActions();
+});
+
+// Fallback: Direct event listener
+window.addEventListener('custom:hello', () => {
+  alert('Hello!');
+});
 loadPage();
