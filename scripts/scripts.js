@@ -161,6 +161,4 @@ if (sk) {
     document.querySelector('aem-sidekick').addEventListener('custom:hello', sayHello);
   }, { once: true });
 }
-
-
 loadPage();
