@@ -145,18 +145,43 @@ async function loadPage() {
   loadDelayed();
 }
 
-/**
- * Listener for Sidekick custom plugins
- */
-window.addEventListener('sidekick-ready', () => {
+// Wait for the sidekick to be ready
+const sk = document.querySelector('aem-sidekick');
+
+const sayHello = () => {
+  alert('Hello!');
+};
+
+if (sk) {
+  // If sidekick is already in the DOM
+  sk.addEventListener('custom:hello', sayHello);
+} else {
+  // Wait for the sidekick to load
+  document.addEventListener('sidekick-ready', () => {
+    document.querySelector('aem-sidekick').addEventListener('custom:hello', sayHello);
+  }, { once: true });
+}
+
+function registerSidekickPlugin() {
   const sk = document.querySelector('aem-sidekick');
-  sk.addEventListener('custom', (e) => {
-    // Check if the event matches the ID from your config.json
+
+  const handleCustomEvent = (e) => {
     if (e.detail.id === 'hello-plugin') {
-      alert('Hello! This is your custom Sidekick plugin working.');
-      console.log('Sidekick said hello!');
+      alert('Hello! The connection is now active.');
     }
-  });
-}, { once: true });
+  };
+
+  if (sk) {
+    // If sidekick is already in the DOM
+    sk.addEventListener('custom', handleCustomEvent);
+  } else {
+    // If sidekick hasn't loaded yet, wait for the official ready event
+    window.addEventListener('sidekick-ready', () => {
+      document.querySelector('aem-sidekick').addEventListener('custom', handleCustomEvent);
+    }, { once: true });
+  }
+}
+
+registerSidekickPlugin();
 
 loadPage();

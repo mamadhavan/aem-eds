@@ -32,6 +32,12 @@
       "title": "Say Hello",
       "event": "say-hello",
       "environments": ["preview", "dev"]
+    },
+    {
+      "id": "say-hi",
+      "title": "Say Hi",
+      "event": "say-hi-event",
+      "environments": ["preview", "dev"]
     }
   ]
 }
