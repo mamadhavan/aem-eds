@@ -28,9 +28,10 @@ async function takeFullPageScreenshot() {
   document.body.style.cursor = 'wait';
 
   try {
-    // Dynamic import to bypass the "Unable to resolve path" build error
-    const htmlToImage = await import('https://cdn.skypack.dev/html-to-image');
-    
+    // String-based dynamic import prevents the 'Unable to resolve path' error
+    const modulePath = 'https://cdn.skypack.dev/html-to-image';
+    const htmlToImage = await import(modulePath);
+
     const dataUrl = await htmlToImage.toPng(root, {
       cacheBust: true,
       skipFonts: true,
@@ -67,7 +68,8 @@ export default function initSidekickActions() {
     setupListener(sk);
   } else {
     document.addEventListener('sidekick-ready', () => {
-      setupListener(document.querySelector('aem-sidekick'));
+      const sidekick = document.querySelector('aem-sidekick');
+      if (sidekick) setupListener(sidekick);
     }, { once: true });
   }
 }
