@@ -129,6 +129,16 @@ async function loadLazy(doc) {
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
   initSidekickActions();
+
+  try {
+      const { getMetadata } = await import('./aem.js');
+      if (getMetadata('cms') === 'helix' || document.querySelector('aem-sidekick')) {
+        const initSidekickActions = (await import('./sidekick-actions.js')).default;
+        initSidekickActions();
+      }
+    } catch (e) {
+      // console.error(e);
+    }
 }
 
 /**

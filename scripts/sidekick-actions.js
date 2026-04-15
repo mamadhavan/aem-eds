@@ -46,17 +46,63 @@ async function takeFullPageScreenshot() {
 
     if (sidekick) sidekick.style.display = 'none';
 
+    const scale = 1.5;
     const canvas = await html2canvas(root, {
       useCORS: true,
-      scale: 1.5,
+      scale,
       scrollY: -window.scrollY,
       backgroundColor: window.getComputedStyle(document.body).backgroundColor,
     });
 
     if (sidekick) sidekick.style.display = 'block';
 
+    const ctx = canvas.getContext('2d');
+    const timestamp = new Date().toLocaleString();
+
+    // 1. Find all images that were part of the capture
+    const images = document.querySelectorAll('main img');
+
+    // 2. Set style for the stamps
+    ctx.font = `${14 * scale}px sans-serif`;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    ctx.shadowBlur = 4 * scale;
+
+    images.forEach((img) => {
+      const rect = img.getBoundingClientRect();
+
+      // Calculate position on canvas relative to the body
+      // We multiply by scale because the canvas is larger than the screen
+      const x = (rect.left + window.scrollX) * scale;
+      const y = (rect.top + window.scrollY) * scale;
+
+      // Only stamp if the image is actually visible/has dimensions
+      if (rect.width > 10 && rect.height > 10) {
+        // Draw timestamp at the bottom-right of each image
+        const padding = 10 * scale;
+        const textWidth = ctx.measureText(timestamp).width;
+
+        // Background for the text to ensure readability
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fillRect(
+          x + (rect.width * scale) - textWidth - padding - 5,
+          y + (rect.height * scale) - padding - (14 * scale),
+          textWidth + 10,
+          18 * scale
+        );
+
+        // Actual text
+        ctx.fillStyle = 'white';
+        ctx.fillText(
+          timestamp,
+          x + (rect.width * scale) - textWidth - padding,
+          y + (rect.height * scale) - padding
+        );
+      }
+    });
+
     const link = document.createElement('a');
-    link.download = `screenshot-${Date.now()}.png`;
+    link.download = `stamped-capture-${Date.now()}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
   } catch (error) {
