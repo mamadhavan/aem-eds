@@ -6,9 +6,9 @@ async function takeScreenshotAndUpload() {
   try {
     // eslint-disable-next-line import/no-unresolved
     const html2canvas = (await import('https://cdn.skypack.dev/html2canvas')).default;
-    const canvas = await html2canvas(document.body, { useCORS: true, scale: 1.5 });
-    const base64Data = canvas.toDataURL('image/png');
-
+    const canvas = await html2canvas(document.body, { useCORS: true, scale: 1 });
+    const base64Data = canvas.toDataURL('image/jpeg', 0.5);
+    console.log('Original Size estimate:', (base64Data.length / 1024).toFixed(2), 'KB');
     const response = await fetch(appBuilderUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
