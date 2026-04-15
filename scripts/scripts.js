@@ -130,18 +130,19 @@ async function loadLazy(doc) {
   loadFonts();
   initSidekickActions();
 
+  const { getMetadata } = await import('./aem.js');
+
   try {
-      const { getMetadata } = await import('./aem.js');
       const isHelix = getMetadata('cms') === 'helix';
       const skExists = document.querySelector('aem-sidekick');
-
       if (isHelix || skExists) {
-        // Renamed to 'setupSidekick' to avoid redeclaration error
-        const setupSidekick = (await import('./sidekick-actions.js')).default;
-        setupSidekick();
+        // Use a unique name to avoid 'already declared' errors
+        const sidekickInitializer = (await import('./sidekick-actions.js')).default;
+        sidekickInitializer();
       }
     } catch (e) {
-      // Silent catch for sidekick actions
+      // eslint-disable-next-line no-console
+      console.error('Sidekick actions failed', e);
     }
 }
 
