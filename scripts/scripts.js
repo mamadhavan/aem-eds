@@ -133,17 +133,17 @@ async function loadLazy(doc) {
   const { getMetadata } = await import('./aem.js');
 
   try {
-      const isHelix = getMetadata('cms') === 'helix';
-      const skExists = document.querySelector('aem-sidekick');
-      if (isHelix || skExists) {
-        // Use a unique name to avoid 'already declared' errors
-        const sidekickInitializer = (await import('./sidekick-actions.js')).default;
-        sidekickInitializer();
-      }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('Sidekick actions failed', e);
+    const isHelix = getMetadata('cms') === 'helix';
+    const skExists = document.querySelector('aem-sidekick');
+    if (isHelix || skExists) {
+      // Use a unique name to avoid 'already declared' errors
+      const sidekickInitializer = (await import('./sidekick-actions.js')).default;
+      sidekickInitializer();
     }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Sidekick actions failed', e);
+  }
 }
 
 /**
