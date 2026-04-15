@@ -2,7 +2,7 @@
 
 async function takeScreenshotAndUpload() {
   console.log('Capture event triggered');
-  const appBuilderUrl = 'https://YOUR_NAMESPACE.adobeio-static.net/api/v1/web/screenshot-uploader';
+  const appBuilderUrl = 'https://42794-snapshot-stage.adobeio-static.net/api/v1/web/aem-eds-ss/screenshot-v7';
   try {
     // eslint-disable-next-line import/no-unresolved
     const html2canvas = (await import('https://cdn.skypack.dev/html2canvas')).default;
