@@ -4,6 +4,7 @@ async function takeScreenshotAndUpload() {
   console.log('Capture event triggered');
   const appBuilderUrl = 'https://YOUR_NAMESPACE.adobeio-static.net/api/v1/web/screenshot-uploader';
   try {
+    // eslint-disable-next-line import/no-unresolved
     const html2canvas = (await import('https://cdn.skypack.dev/html2canvas')).default;
     const canvas = await html2canvas(document.body, { useCORS: true, scale: 1.5 });
     const base64Data = canvas.toDataURL('image/png');
