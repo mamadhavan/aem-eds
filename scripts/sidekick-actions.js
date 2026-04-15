@@ -88,7 +88,7 @@ async function takeFullPageScreenshot() {
           x + (rect.width * scale) - textWidth - padding - 5,
           y + (rect.height * scale) - padding - (14 * scale),
           textWidth + 10,
-          18 * scale
+          18 * scale,
         );
 
         // Actual text
@@ -96,7 +96,7 @@ async function takeFullPageScreenshot() {
         ctx.fillText(
           timestamp,
           x + (rect.width * scale) - textWidth - padding,
-          y + (rect.height * scale) - padding
+          y + (rect.height * scale) - padding,
         );
       }
     });
