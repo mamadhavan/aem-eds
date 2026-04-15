@@ -132,12 +132,16 @@ async function loadLazy(doc) {
 
   try {
       const { getMetadata } = await import('./aem.js');
-      if (getMetadata('cms') === 'helix' || document.querySelector('aem-sidekick')) {
-        const initSidekickActions = (await import('./sidekick-actions.js')).default;
-        initSidekickActions();
+      const isHelix = getMetadata('cms') === 'helix';
+      const skExists = document.querySelector('aem-sidekick');
+
+      if (isHelix || skExists) {
+        // Renamed to 'setupSidekick' to avoid redeclaration error
+        const setupSidekick = (await import('./sidekick-actions.js')).default;
+        setupSidekick();
       }
     } catch (e) {
-      // console.error(e);
+      // Silent catch for sidekick actions
     }
 }
 

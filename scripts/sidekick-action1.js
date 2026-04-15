@@ -28,10 +28,14 @@ async function takeScreenshotAndUpload() {
         base64Data,
         fileName: `audit-${Date.now()}.png`,
         damPath: '/content/dam/screenshots',
-      }),
+      }), // Added trailing comma if required by your L91
     });
 
-    if (response.ok) alert('Successfully archived to AEM DAM!');
+    if (response.ok) {
+      alert('Successfully archived to AEM DAM!');
+    } else {
+      throw new Error('App Builder upload failed');
+    }
   } catch (error) {
     console.error('Workflow failed:', error);
     if (sidekick) sidekick.style.display = 'block';
@@ -46,6 +50,11 @@ export default function initSidekickActions() {
   };
 
   const sk = document.querySelector('aem-sidekick');
-  if (sk) setupListener(sk);
-  else document.addEventListener('sidekick-ready', () => setupListener(document.querySelector('aem-sidekick')), { once: true });
+  if (sk) {
+    setupListener(sk);
+  } else {
+    document.addEventListener('sidekick-ready', () => {
+      setupListener(document.querySelector('aem-sidekick'));
+    }, { once: true });
+  }
 }
