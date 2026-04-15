@@ -35,7 +35,7 @@
     {
       "id": "archive-to-dam",
       "title": "Screenshot and Upload",
-      "event": "custom:archive-to-dam"
+      "event": "archive-to-dam"
     }
   ]
 }

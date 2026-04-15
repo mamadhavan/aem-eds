@@ -12,6 +12,7 @@ import {
   loadCSS,
 } from './aem.js';
 import initSidekickActions from './sidekick-actions.js';
+import initDamArchive from './sidekick-action1.js';
 
 /**
  * Moves all the attributes from a given elmenet to another given element.
@@ -129,21 +130,7 @@ async function loadLazy(doc) {
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
   initSidekickActions();
-
-  const { getMetadata } = await import('./aem.js');
-
-  try {
-    const isHelix = getMetadata('cms') === 'helix';
-    const skExists = document.querySelector('aem-sidekick');
-    if (isHelix || skExists) {
-      // Use a unique name to avoid 'already declared' errors
-      const sidekickInitializer = (await import('./sidekick-actions.js')).default;
-      sidekickInitializer();
-    }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('Sidekick actions failed', e);
-  }
+  initDamArchive();
 }
 
 /**
