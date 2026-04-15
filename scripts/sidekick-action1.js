@@ -27,8 +27,8 @@ async function takeScreenshotAndUpload() {
 
 export default function initSidekickActions() {
   // This will show up in your console to prove it loaded
-  console.log('Sidekick Action 1: Initializing...'); 
-  
+  console.log('Sidekick Action 1: Initializing...');
+
   const setup = (sk) => {
     sk.addEventListener('custom:archive-to-dam', takeScreenshotAndUpload);
     console.log('Sidekick Action 1: Listener Attached!');
