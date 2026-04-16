@@ -15,7 +15,7 @@
     },
     {
       "id": "puppeteer-audit",
-      "title": "Puppeteer Audit",
+      "title": "Puppeteer Screenshot",
       "containerId": "tools",
       "environments": ["preview", "live", "development"],
       "event": "click",
