@@ -102,7 +102,7 @@ async function takeFullPageScreenshot() {
     });
 
     const link = document.createElement('a');
-    link.download = `stamped-capture-${Date.now()}.png`;
+    link.download = `snapshot-${Date.now()}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
   } catch (error) {
