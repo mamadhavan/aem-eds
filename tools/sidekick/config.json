@@ -14,12 +14,6 @@
       "environments": ["preview", "live", "development"]
     },
     {
-      "id": "screenshot",
-      "title": "📸 Screenshot",
-      "event": "screenshot",
-      "environments": ["dev", "preview"]
-    },
-    {
       "id": "puppeteer-audit",
       "title": "Puppeteer Audit",
       "containerId": "tools",
@@ -29,14 +23,8 @@
     },
     {
       "id": "screenshot",
-      "title": "Take Screenshot",
+      "title": "📸 Take Screenshot",
       "event": "hello"
-    },
-    {
-      "id": "archive-to-dam",
-      "title": "Screenshot and Upload",
-      "event": "archive-to-dam"
     }
   ]
 }
-
