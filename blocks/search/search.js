@@ -3,7 +3,7 @@ async function searchSite(query) {
   const resp = await fetch('/query-index.json');
   const json = await resp.json();
   return json.data.filter((post) => {
-    const text = `${post.title} ${post.description} ${post.introParagraph}`.toLowerCase();
+    const text = `${post.title} ${post.description} ${post.introParagraph} ${post.pageHeading}`.toLowerCase();
     return text.includes(query.toLowerCase());
   });
 }
