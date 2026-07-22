@@ -21,6 +21,10 @@ indices:
         select: head > meta[property="og:title"]
         value: |
           attribute(el, 'content')
+      pageHeading:
+        select: main h1:first-of-type
+        value: |
+          textContent(el)
       introParagraph:
         select: main p:first-of-type
         value: |
