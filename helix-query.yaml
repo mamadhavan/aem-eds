@@ -28,4 +28,9 @@ indices:
       introParagraph:
         select: main p:first-of-type
         value: |
-          textContent(el)  
+          textContent(el)
+      content:
+        select: main
+        value: |
+          textContent(el)    
+      
