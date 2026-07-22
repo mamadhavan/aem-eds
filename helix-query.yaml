@@ -29,8 +29,14 @@ indices:
         select: main p:first-of-type
         value: |
           textContent(el)
+  contact:
+    include:
+      - '/**'
+    target: /free-text.json
+    properties:
       content:
         select: main
         value: |
-          textContent(el)    
+          textContent(el)            
+  
       
