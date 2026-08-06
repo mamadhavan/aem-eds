@@ -79,3 +79,15 @@ export function notifyDisplay(propositions) {
   });
 
 }
+
+export function notifyClick(propositions) {
+  if (!propositions?.length) return;
+  window.alloy('sendEvent', {
+    xdm: {
+      eventType: '_experience.decisioning.propositionInteract',
+      _experience: {
+        decisioning: { propositions },
+      },
+    },
+  });
+}
