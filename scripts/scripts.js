@@ -1,3 +1,4 @@
+console.log('script file loaded');
 import {
   buildBlocks,
   loadHeader,
