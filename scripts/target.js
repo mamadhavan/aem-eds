@@ -4,6 +4,8 @@ import { loadAlloy } from './alloy-setup.js';
 let cachedPropositions = null;
 
 export async function getTargetPropositions(scopes = []) {
+
+console.log('[Target] getTargetPropositions called with scopes',scopes);
   if (cachedPropositions) return cachedPropositions;
 
   await loadAlloy();
