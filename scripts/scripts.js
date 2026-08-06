@@ -13,6 +13,16 @@ import {
 } from './aem.js';
 import initSidekickActions from './sidekick-actions.js';
 import initDamArchive from './sidekick-action1.js';
+import { getTargetPropositions } from './target.js';
+
+
+async function loadEager(doc) {
+  window.targetPropositions = await getTargetPropositions([
+    'personalized-text',
+  ]);
+
+  decorateMain(doc);
+}
 
 /**
  * Moves all the attributes from a given elmenet to another given element.
