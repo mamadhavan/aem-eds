@@ -96,6 +96,17 @@ export function decorateMain(main) {
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
+
+  try {
+  window.targetPropositions = await getTargetPropositions([
+        'personalized-text',
+      ]);
+  } catch(e){
+     console.error('target failed to load', e);
+     window.targetPropositions=[];
+  }
+
+
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
@@ -111,11 +122,6 @@ async function loadEager(doc) {
   } catch (e) {
     // do nothing
   }
-  window.targetPropositions = await getTargetPropositions([
-      'personalized-text',
-    ]);
-
-    decorateMain(doc);
 }
 
 /**
