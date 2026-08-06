@@ -5,11 +5,9 @@ const ORG_ID = 'E71EADC8584130D00A495EBD@AdobeOrg';       // Replace with your a
 
 export function loadAlloy() {
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
 
-    // If already loaded and configured, skip
-
-    if (window.alloy) {
+    if (window.alloy && window.alloy.__configured) {
 
       resolve();
 
@@ -17,43 +15,63 @@ export function loadAlloy() {
 
     }
 
-    // Standard Adobe Alloy queue stub
+    // Fresh queue stub
 
-    /* eslint-disable */
+    window.alloy = function() {
 
-    !function(n,o){o in n||(n[o]=function(){n[o].q.push(arguments)},n[o].q=[])}(window,"alloy");
+      (window.alloy.q = window.alloy.q || []).push(arguments);
 
-    /* eslint-enable */
+    };
+
+    window.alloy.q = [];
 
     const script = document.createElement('script');
 
-    script.src = 'https://cdn1.adoberesources.net/alloy/2.19.2/alloy.min.js';
+    script.src = 'https://cdn1.adoberesources.net/alloy/2.20.0/alloy.min.js';
 
     script.async = true;
 
-    script.onload = () => {
+    script.onload = async () => {
 
-      window.alloy('configure', {
+      try {
 
-        datastreamId: DATASTREAM_ID,
+        // AWAIT configure — critical step
 
-        orgId: ORG_ID,
+        await window.alloy('configure', {
 
-        defaultConsent: 'in',
+          datastreamId: DATASTREAM_ID,
 
-        renderDecisions: false,
+          orgId: ORG_ID,
 
-      });
+          defaultConsent: 'in',
 
-      resolve();
+          renderDecisions: false,
+
+        });
+
+        // Mark as configured so we don't reconfigure on next call
+
+        window.alloy.__configured = true;
+
+        console.log('[Alloy] configured successfully');
+
+        resolve();
+
+      } catch (err) {
+
+        console.error('[Alloy] configure failed:', err);
+
+        reject(err);
+
+      }
 
     };
 
     script.onerror = (err) => {
 
-      console.error('[Alloy] Script load error:', err);
+      console.error('[Alloy] script load failed:', err);
 
-      resolve();
+      reject(err);
 
     };
 
