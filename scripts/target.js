@@ -1,3 +1,4 @@
+// Fixed version
 import { loadAlloy } from './alloy-setup.js';
 
 let cachedPropositions = null;
