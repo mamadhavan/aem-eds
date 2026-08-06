@@ -1,4 +1,5 @@
 import {
+  buildBlocks,
   loadHeader,
   loadFooter,
   decorateButtons,
@@ -15,7 +16,7 @@ import initSidekickActions from './sidekick-actions.js';
 import initDamArchive from './sidekick-action1.js';
 import getTargetPropositions from './target.js';
 
-
+console.log('script file loaded');
 /**
  * Moves all the attributes from a given elmenet to another given element.
  * @param {Element} from the element to copy attributes from
