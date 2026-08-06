@@ -1,93 +1,99 @@
-import { loadAlloy } from './alloy-setup.js';
- 
+import {
+    loadAlloy
+} from './alloy-setup.js';
+
 let cachedPropositions = null;
- 
+
 export async function getTargetPropositions(scopes = []) {
 
-  if (cachedPropositions) return cachedPropositions;
- 
-  await loadAlloy();
- 
-  const result = await window.alloy('sendEvent', {
+    if (cachedPropositions) return cachedPropositions;
 
-    renderDecisions: false,
+    await loadAlloy();
 
-    personalization: {
+    const result = await window.alloy('sendEvent', {
 
-      decisionScopes: scopes,
+        renderDecisions: false,
 
-    },
+        personalization: {
 
-    xdm: {
-
-      eventType: 'web.webpagedetails.pageViews',
-
-      web: {
-
-        webPageDetails: {
-
-          name: document.title,
-
-          URL: window.location.href,
+            decisionScopes: scopes,
 
         },
 
-      },
+        xdm: {
 
-    },
+            eventType: 'web.webpagedetails.pageViews',
 
-    data: {
+            web: {
 
-      __adobe: {
+                webPageDetails: {
 
-        target: {
+                    name: document.title,
 
-          userType: window.localStorage.getItem('userType') || 'anonymous',
+                    URL: window.location.href,
+
+                },
+
+            },
 
         },
 
-      },
+        data: {
 
-    },
+            __adobe: {
 
-  });
- 
-  cachedPropositions = result?.propositions || [];
+                target: {
 
-  return cachedPropositions;
+                    userType: window.localStorage.getItem('userType') || 'anonymous',
+
+                },
+
+            },
+
+        },
+
+    });
+
+    cachedPropositions = result?.propositions || [];
+
+    return cachedPropositions;
 
 }
- 
+
 export function notifyDisplay(propositions) {
 
-  if (!propositions?.length) return;
+    if (!propositions?.length) return;
 
-  window.alloy('sendEvent', {
+    window.alloy('sendEvent', {
 
-    xdm: {
+        xdm: {
 
-      eventType: '_experience.decisioning.propositionDisplay',
+            eventType: '_experience.decisioning.propositionDisplay',
 
-      _experience: {
+            _experience: {
 
-        decisioning: { propositions },
+                decisioning: {
+                    propositions
+                },
 
-      },
+            },
 
-    },
+        },
 
-  });
+    });
 
 }
 
 export function notifyClick(propositions) {
-  if (!propositions?.length) return;
-  window.alloy('sendEvent', {
-    xdm: {
-      eventType: '_experience.decisioning.propositionInteract',
-      _experience: {
-        decisioning: { propositions },
-      },
-    },
-  });
+    if (!propositions?.length) return;
+    window.alloy('sendEvent', {
+        xdm: {
+            eventType: '_experience.decisioning.propositionInteract',
+            _experience: {
+                decisioning: {
+                    propositions
+                },
+            },
+        },
+    });
 }
