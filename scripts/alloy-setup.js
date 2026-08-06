@@ -2,6 +2,7 @@ const DATASTREAM_ID = '3f75f0f0-4f07-482b-930a-8ef876cf2853';
 const ORG_ID = 'E71EADC8584130D00A495EBD@AdobeOrg';
 
 export function loadAlloy() {
+console.log('inside load alloy ');
   return new Promise((resolve) => {
     if (window.alloy) {
       resolve();
