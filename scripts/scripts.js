@@ -13,7 +13,7 @@ import {
 } from './aem.js';
 import initSidekickActions from './sidekick-actions.js';
 import initDamArchive from './sidekick-action1.js';
-import getTargetPropositions from './target.js';
+import {getTargetPropositions} from './target.js';
 
 console.log('script file loaded');
 /**
