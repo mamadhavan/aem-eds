@@ -94,13 +94,15 @@ export function decorateMain(main) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
+  console.log('[DEBUG] loadEager started');
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
-
+ console.log('[DEBUG] About to call getTargetProposition');
   try {
   window.targetPropositions = await getTargetPropositions([
         'personalized-text',
       ]);
+      console.log('[DEBUG] target propostions result', window.targetPropositions')
   } catch(e){
      console.error('target failed to load', e);
      window.targetPropositions=[];
