@@ -53,7 +53,7 @@ export function loadAlloy() {
 
         window.alloy.__configured = true;
 
-        console.log('[Alloy] configured successfully');
+        console.log('[Alloy] configured successfully1');
 
         resolve();
 
