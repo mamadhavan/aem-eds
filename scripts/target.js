@@ -4,15 +4,21 @@ let cachedPropositions = null;
  
 export async function getTargetPropositions(scopes = []) {
 
+ console.log('inside get target propositions',scopes);
+
   if (cachedPropositions) {
-
+  console.log('inside get cached propositions');
     return cachedPropositions;
-
   }
  
   // 1. Force load alloy and wait for it
-
+   console.log('Before calling alloy');
+   try {
   await loadAlloy();
+  console.log('Target allow called successful');
+  } catch(e){
+  console.error('Target alloy failed'+e)
+  }
  
   // 2. Double-check window.alloy exists
 
