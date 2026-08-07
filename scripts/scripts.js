@@ -68,7 +68,21 @@ async function loadFonts() {
  */
 async function configureAlloy() {
   // Step 1: Define queue stub before script loads
-  await loadScript(`${window.hlx.codeBasePath}/scripts/alloy.min.js`);
+  await new Promise((resolve,reject)) => {
+    if(document.querySelector('script[src*="alloy.min.js"]')) {
+    resolve();
+    return;
+    }
+    const script = document.createElement('script');
+    script.src = `${window.hlx.codeBasePath}/scripts/alloy.min.js`;
+    script.onload = () => {
+      console.log('script loaded',typeof window.alloy);
+      console.log('script loaded alloy p',window.alloy?.p);
+      resolve();
+    };
+    script.onerror() = () => reject(new Error("script failed to load"));
+    document.head.appendChild(script);
+  });
   await new Promise((resolve) => {
     const check = setInterval(() => {
       if (window.alloy && typeof window.alloy === 'function' && !window.alloy.q) {
@@ -85,6 +99,7 @@ async function configureAlloy() {
   });
 
   // Step 4: Configure alloy with your Datastream ID and Org ID
+  try {
   await window.alloy('configure', {
     datastreamId: '3f75f0f0-4f07-482b-930a-8ef876cf2853',
     orgId: 'E71EADC8584130D00A495EBD@AdobeOrg',
@@ -92,6 +107,10 @@ async function configureAlloy() {
     renderDecisions: false,
   });
   console.log('[Alloy] window.alloy is configured');
+  } catch(err){
+    console.error('alloy config failed', err)
+  }
+
 }
 
 /**
