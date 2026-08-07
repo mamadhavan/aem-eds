@@ -3,18 +3,19 @@ import loadAlloy from './alloy-setup.js';
 let cachedPropositions = null;
 
 export async function getTargetPropositions(scopes = []) {
-  console.log('Step 1 : getTargetprop');
+  console.error('Step 1', scopes);
   if (cachedPropositions) {
-  console.log('Step 2 : getTargetprop');
+    console.error('Step 2');
     return cachedPropositions;
   }
-  console.log('Step 3 : getTargetprop');
+
   try {
+    console.error('Step 3');
     await loadAlloy();
-    console.log('Step 4 : getTargetprop');
+    console.error('Step 4');
   } catch (e) {
-  console.log('Step 5 : failed');
-  console.error('Target alloy failed', e);
+    console.error('Step 5');
+    console.error('Target alloy failed', e);
   }
 
   if (typeof window.alloy !== 'function') {
@@ -38,8 +39,7 @@ export async function getTargetPropositions(scopes = []) {
         },
       },
     });
-    console.error('step 7 send event result ',result);
-    console.error('step 8 send event result ',result?.propositions);
+
     cachedPropositions = result?.propositions || [];
     return cachedPropositions;
   } catch (err) {
