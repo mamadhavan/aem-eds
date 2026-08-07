@@ -5,13 +5,12 @@ export function loadAlloy() {
         clearInterval(check);
         resolve();
       }
-    }, 50);
+    },50);
 
     setTimeout(() => {
       clearInterval(check);
       console.error('[Target] window.alloy is not available after loadAlloy()');
       resolve();
-    }, 3000);
-
+    },3000);
   });
 }
