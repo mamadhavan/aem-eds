@@ -60,7 +60,14 @@ export async function getTargetPropositions(scopes = []) {
     }
 
     const data = await response.json();
-    console.log('[DEBUG] Edge Network response:', data);
+    console.log('[DEBUG] Full Edge Network response:', JSON.stringify(data, null, 2));
+
+     // Log each item in the handle array
+    if (data?.handle) {
+      data.handle.forEach((item, index) => {
+        console.log(`[DEBUG] Handle item ${index}:`, item);
+      });
+    }
 
     // Extract propositions from response
     const propositions = data?.handle?.reduce((acc, item) => {
