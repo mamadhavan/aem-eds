@@ -68,7 +68,7 @@ async function loadFonts() {
  */
 async function configureAlloy() {
   // Step 1: Define queue stub before script loads
-  await new Promise((resolve,reject)) => {
+  await new Promise((resolve,reject) => {
     if(document.querySelector('script[src*="alloy.min.js"]')) {
     resolve();
     return;
