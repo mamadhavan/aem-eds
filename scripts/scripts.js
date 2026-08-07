@@ -68,28 +68,18 @@ async function loadFonts() {
  */
 async function configureAlloy() {
   // Step 1: Define queue stub before script loads
-  window.alloy = window.alloy || function alloy(...args) {
-    (window.alloy.q = window.alloy.q || []).push(args);
-  };
-  window.alloy.q = window.alloy.q || [];
-
-  // Step 2: Load alloy via EDS loadScript — handles CSP nonce automatically
-  await loadScript('https://cdn1.adoberesources.net/alloy/2.20.0/alloy.min.js');
-
-  // Step 3: Wait for real alloy to replace the queue stub
+  await loadScript('./alloy.min.js');
   await new Promise((resolve) => {
     const check = setInterval(() => {
-      // Real alloy has no .q property — stub does
       if (window.alloy && typeof window.alloy === 'function' && !window.alloy.q) {
         clearInterval(check);
+        console.log('[Alloy] window.alloy is available');
         resolve();
       }
     }, 50);
-
-    // Fallback after 3 seconds
     setTimeout(() => {
       clearInterval(check);
-      console.warn('[Alloy] timeout waiting for real alloy to initialize');
+      console.error('[Alloy] window.alloy is not available after loadScript()');
       resolve();
     }, 3000);
   });
@@ -101,6 +91,7 @@ async function configureAlloy() {
     defaultConsent: 'in',
     renderDecisions: false,
   });
+  console.log('[Alloy] window.alloy is configured');
 }
 
 /**
