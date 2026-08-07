@@ -10,14 +10,11 @@ import {
   loadSection,
   loadSections,
   loadCSS,
-  loadScript,
 } from './aem.js';
 import initSidekickActions from './sidekick-actions.js';
-import initDamArchive from './sidekick-action1.js';
-import { getTargetPropositions } from './target.js';
 
 /**
- * Moves all the attributes from a given element to another given element.
+ * Moves all the attributes from a given elmenet to another given element.
  * @param {Element} from the element to copy attributes from
  * @param {Element} to the element to copy attributes to
  */
@@ -63,77 +60,6 @@ async function loadFonts() {
 }
 
 /**
- * Loads and configures Adobe Web SDK (alloy.js).
- * Uses EDS loadScript to handle nonce-based CSP automatically.
- */
-async function configureAlloy() {
-  // Step 1: Register the instance name and define the queue stub.
-  // alloy.min.js reads window.__alloyNS to know which stub(s) to wire up.
-  window.__alloyNS = window.__alloyNS || [];
-  if (!window.__alloyNS.includes('alloy')) {
-    window.__alloyNS.push('alloy');
-  }
-
-  window.alloy = window.alloy || function alloy(...args) {
-    (window.alloy.q = window.alloy.q || []).push(args);
-  };
-  window.alloy.q = window.alloy.q || [];
-
-  // Step 2: Inject the script if not already present
-  await new Promise((resolve, reject) => {
-    if (document.querySelector('script[src*="alloy.min.js"]')) {
-      resolve();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = `${window.hlx.codeBasePath}/scripts/alloy.min.js`;
-
-    script.addEventListener('load', () => {
-      resolve();
-    });
-
-    script.addEventListener('error', () => {
-      reject(new Error('[Alloy] script failed to load'));
-    });
-
-    document.head.appendChild(script);
-  });
-
-  // Step 3: Wait for the real alloy to replace the stub (its .q is drained/removed)
-  await new Promise((resolve) => {
-    const check = setInterval(() => {
-      if (window.alloy && !window.alloy.q) {
-        clearInterval(check);
-        resolve();
-      }
-    }, 50);
-
-    setTimeout(() => {
-      clearInterval(check);
-      console.warn('[Alloy] timeout — alloy.q still exists:', window.alloy?.q);
-      resolve();
-    }, 3000);
-  });
-
-  if (typeof window.alloy !== 'function') {
-    console.error('[Alloy] alloy still not a function after load');
-    return;
-  }
-
-  try {
-    await window.alloy('configure', {
-      datastreamId: '3f75f0f0-4f07-482b-930a-8ef876cf2853',
-      orgId: 'E71EADC8584130D00A495EBD@AdobeOrg',
-      defaultConsent: 'in',
-      renderDecisions: false,
-    });
-  } catch (err) {
-    console.error('[Alloy] configure failed:', err);
-  }
-}
-
-/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
@@ -152,6 +78,7 @@ function buildAutoBlocks() {
  */
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
+  // hopefully forward compatible button decoration
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
@@ -166,23 +93,6 @@ export function decorateMain(main) {
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
-
-  // Step 1: Load and configure alloy first via EDS loadScript
-  try {
-    await configureAlloy();
-  } catch (e) {
-    console.error('[Alloy] configureAlloy failed:', e);
-  }
-
-  // Step 2: Fetch Target propositions after alloy is ready
-  try {
-    window.targetPropositions = await getTargetPropositions(['personalized-text']);
-  } catch (e) {
-    console.error('[Target] failed to load propositions:', e);
-    window.targetPropositions = [];
-  }
-
-  // Step 3: Decorate and render page normally
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
@@ -191,6 +101,7 @@ async function loadEager(doc) {
   }
 
   try {
+    /* if desktop (proxy for fast connection) or fonts already loaded, load fonts.css */
     if (window.innerWidth >= 900 || sessionStorage.getItem('fonts-loaded')) {
       loadFonts();
     }
@@ -218,7 +129,21 @@ async function loadLazy(doc) {
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
   initSidekickActions();
-  initDamArchive();
+
+  const { getMetadata } = await import('./aem.js');
+
+  try {
+    const isHelix = getMetadata('cms') === 'helix';
+    const skExists = document.querySelector('aem-sidekick');
+    if (isHelix || skExists) {
+      // Use a unique name to avoid 'already declared' errors
+      const sidekickInitializer = (await import('./sidekick-actions.js')).default;
+      sidekickInitializer();
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Sidekick actions failed', e);
+  }
 }
 
 /**
@@ -228,6 +153,7 @@ async function loadLazy(doc) {
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
+  // load anything that can be postponed to the latest here
 }
 
 async function loadPage() {
@@ -235,5 +161,4 @@ async function loadPage() {
   await loadLazy(document);
   loadDelayed();
 }
-
 loadPage();
