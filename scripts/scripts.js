@@ -106,6 +106,14 @@ async function loadEager(doc) {
     window.targetPropositions = [];
   }
 
+  // ADD THIS: Check what window.alloy actually is after loading
+  console.log('[DEBUG] After getTargetPropositions, window.alloy =', window.alloy);
+  console.log('[DEBUG] typeof window.alloy =', typeof window.alloy);
+  if (window.alloy) {
+    console.log('[DEBUG] window.alloy keys:', Object.keys(window.alloy));
+    console.log('[DEBUG] window.alloy.q =', window.alloy.q);
+  }
+
   const main = doc.querySelector('main');
   if (main) {
     console.log('[DEBUG] Found main element, decorating...');
