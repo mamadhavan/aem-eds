@@ -3,16 +3,16 @@ import loadAlloy from './alloy-setup.js';
 let cachedPropositions = null;
 
 export async function getTargetPropositions(scopes = []) {
-  console.error('Step 1', scopes);
+  console.log('Step 1', scopes);
   if (cachedPropositions) {
-    console.error('Step 2');
+    console.log('Step 2');
     return cachedPropositions;
   }
 
   try {
-    console.error('Step 3');
+    console.log('Step 3');
     await loadAlloy();
-    console.error('Step 4');
+    console.log('Step 4');
   } catch (e) {
     console.error('Step 5');
     console.error('Target alloy failed', e);
@@ -39,7 +39,8 @@ export async function getTargetPropositions(scopes = []) {
         },
       },
     });
-
+    console.log('Step 6', result);
+    console.log('Step 7', result?.propositions);
     cachedPropositions = result?.propositions || [];
     return cachedPropositions;
   } catch (err) {
