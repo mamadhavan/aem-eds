@@ -6,4 +6,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <script nonce="aem" src="/scripts/aem.js" type="module"></script>
 <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
+<script>
+  window.alloy = window.alloy || function() {
+    (window.alloy.q = window.alloy.q || []).push(arguments);
+  };
+  window.alloy.q = window.alloy.q || [];
+</script>
+<script src="https://cdn1.adoberesources.net/alloy/2.20.0/alloy.min.js"> </script>
+<script>
+  window.alloy("configure", {
+    "datastreamId": "3f75f0f0-4f07-482b-930a-8ef876cf2853",
+    "orgId": "E71EADC8584130D00A495EBD@AdobeOrg",
+    "edgeConfigId": "YOUR_EDGE_CONFIG_ID",
+    "defaultConsent": "in",
+    "readerDomain": "false"
+  });
+</script>
 <link rel="stylesheet" href="/styles/styles.css"/>
