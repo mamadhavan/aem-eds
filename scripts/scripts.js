@@ -10,14 +10,14 @@ import {
   loadSection,
   loadSections,
   loadCSS,
+  loadScript,
 } from './aem.js';
 import initSidekickActions from './sidekick-actions.js';
 import initDamArchive from './sidekick-action1.js';
 import { getTargetPropositions } from './target.js';
 
-console.log('script file loaded');
 /**
- * Moves all the attributes from a given elmenet to another given element.
+ * Moves all the attributes from a given element to another given element.
  * @param {Element} from the element to copy attributes from
  * @param {Element} to the element to copy attributes to
  */
@@ -63,6 +63,47 @@ async function loadFonts() {
 }
 
 /**
+ * Loads and configures Adobe Web SDK (alloy.js).
+ * Uses EDS loadScript to handle nonce-based CSP automatically.
+ */
+async function configureAlloy() {
+  // Step 1: Define queue stub before script loads
+  window.alloy = window.alloy || function alloy(...args) {
+    (window.alloy.q = window.alloy.q || []).push(args);
+  };
+  window.alloy.q = window.alloy.q || [];
+
+  // Step 2: Load alloy via EDS loadScript — handles CSP nonce automatically
+  await loadScript('https://cdn1.adoberesources.net/alloy/2.20.0/alloy.min.js');
+
+  // Step 3: Wait for real alloy to replace the queue stub
+  await new Promise((resolve) => {
+    const check = setInterval(() => {
+      // Real alloy has no .q property — stub does
+      if (window.alloy && typeof window.alloy === 'function' && !window.alloy.q) {
+        clearInterval(check);
+        resolve();
+      }
+    }, 50);
+
+    // Fallback after 3 seconds
+    setTimeout(() => {
+      clearInterval(check);
+      console.warn('[Alloy] timeout waiting for real alloy to initialize');
+      resolve();
+    }, 3000);
+  });
+
+  // Step 4: Configure alloy with your Datastream ID and Org ID
+  await window.alloy('configure', {
+    datastreamId: 'YOUR_ACTUAL_DATASTREAM_ID',
+    orgId: 'YOUR_ACTUAL_ORG_ID@AdobeOrg',
+    defaultConsent: 'in',
+    renderDecisions: false,
+  });
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
@@ -81,7 +122,6 @@ function buildAutoBlocks() {
  */
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
-  // hopefully forward compatible button decoration
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
@@ -97,13 +137,22 @@ async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
 
+  // Step 1: Load and configure alloy first via EDS loadScript
+  try {
+    await configureAlloy();
+  } catch (e) {
+    console.error('[Alloy] configureAlloy failed:', e);
+  }
+
+  // Step 2: Fetch Target propositions after alloy is ready
   try {
     window.targetPropositions = await getTargetPropositions(['personalized-text']);
   } catch (e) {
-    console.error('target failed to load', e);
+    console.error('[Target] failed to load propositions:', e);
     window.targetPropositions = [];
   }
 
+  // Step 3: Decorate and render page normally
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
@@ -112,7 +161,6 @@ async function loadEager(doc) {
   }
 
   try {
-    /* if desktop (proxy for fast connection) or fonts already loaded, load fonts.css */
     if (window.innerWidth >= 900 || sessionStorage.getItem('fonts-loaded')) {
       loadFonts();
     }
@@ -150,7 +198,6 @@ async function loadLazy(doc) {
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
-  // load anything that can be postponed to the latest here
 }
 
 async function loadPage() {
@@ -158,4 +205,5 @@ async function loadPage() {
   await loadLazy(document);
   loadDelayed();
 }
+
 loadPage();

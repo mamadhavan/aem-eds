@@ -1,25 +1,18 @@
-import loadAlloy from './alloy-setup.js';
-
 let cachedPropositions = null;
 
+/**
+ * Sends a request to Adobe Edge Network (Adobe Target) for personalization propositions.
+ * @param {Array<string>} scopes Array of decision scopes (e.g. ['personalized-text'])
+ * @returns {Promise<Array>} Array of propositions returned by Target
+ */
 export async function getTargetPropositions(scopes = []) {
-  console.log('Step 1', scopes);
   if (cachedPropositions) {
-    console.log('Step 2');
     return cachedPropositions;
   }
 
-  try {
-    console.log('Step 3');
-    await loadAlloy();
-    console.log('Step 4');
-  } catch (e) {
-    console.error('Step 5');
-    console.error('Target alloy failed', e);
-  }
-
+  // Ensure window.alloy is available (configured in scripts.js)
   if (typeof window.alloy !== 'function') {
-    console.error('[Target] window.alloy is not available after loadAlloy()');
+    console.error('[Target] window.alloy is not available');
     return [];
   }
 
@@ -39,8 +32,7 @@ export async function getTargetPropositions(scopes = []) {
         },
       },
     });
-    console.log('Step 6', result);
-    console.log('Step 7', result?.propositions);
+
     cachedPropositions = result?.propositions || [];
     return cachedPropositions;
   } catch (err) {
@@ -49,9 +41,14 @@ export async function getTargetPropositions(scopes = []) {
   }
 }
 
+/**
+ * Notifies Adobe Target that an offer was displayed (required for impression reporting).
+ * @param {Array} propositions Array of proposition objects that were rendered
+ */
 export function notifyDisplay(propositions) {
-  if (!propositions?.length) return;
-
+  if (!propositions?.length) {
+    return;
+  }
   window.alloy('sendEvent', {
     xdm: {
       eventType: '_experience.decisioning.propositionDisplay',
@@ -62,9 +59,14 @@ export function notifyDisplay(propositions) {
   });
 }
 
+/**
+ * Notifies Adobe Target that a user interacted with/clicked an offer (for conversion goals).
+ * @param {Array} propositions Array of proposition objects that were clicked
+ */
 export function notifyClick(propositions) {
-  if (!propositions?.length) return;
-
+  if (!propositions?.length) {
+    return;
+  }
   window.alloy('sendEvent', {
     xdm: {
       eventType: '_experience.decisioning.propositionInteract',
