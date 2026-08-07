@@ -5,85 +5,87 @@ export default function loadAlloy() {
   console.log('[DEBUG] loadAlloy() called');
 
   return new Promise((resolve, reject) => {
-    // Check if already loaded
-    if (window.alloy && window.alloy.configured) {
-      console.log('[DEBUG] alloy already configured, skipping');
+    // Check if real alloy is already there
+    if (window.alloy && typeof window.alloy === 'function' && !window.alloy.q) {
+      console.log('[DEBUG] Real alloy already initialized');
       resolve();
       return;
     }
 
     console.log('[DEBUG] Starting alloy initialization...');
 
-    // Step 1: Register instance name
-    window.__alloyNS = window.__alloyNS || [];
-    if (!window.__alloyNS.includes('alloy')) {
-      window.__alloyNS.push('alloy');
-      console.log('[DEBUG] Registered alloy in __alloyNS:', window.__alloyNS);
+    // CRITICAL: Set __alloyNS BEFORE creating stub
+    // This tells the alloy.min.js IIFE which globals to wire up
+    if (!window.__alloyNS) {
+      window.__alloyNS = ['alloy'];
+      console.log('[DEBUG] Set window.__alloyNS:', window.__alloyNS);
     }
 
-    // Step 2: Create queue stub
+    // Create queue stub
     window.alloy = window.alloy || function alloy(...args) {
-      console.log('[DEBUG] Queue stub called with args:', args);
+      console.log('[DEBUG] Queue stub called, pushing to queue');
       (window.alloy.q = window.alloy.q || []).push(args);
     };
     window.alloy.q = window.alloy.q || [];
-    console.log('[DEBUG] Queue stub created, window.alloy.q:', window.alloy.q);
+    console.log('[DEBUG] Queue stub created');
 
-    // Step 3: Inject script tag
+    // Inject the script
     const script = document.createElement('script');
     script.src = 'https://cdn1.adoberesources.net/alloy/2.20.0/alloy.min.js';
     script.async = true;
 
-    console.log('[DEBUG] Created script tag, src:', script.src);
-
     script.addEventListener('load', () => {
       console.log('[DEBUG] Script load event fired');
-      console.log('[DEBUG] window.alloy type:', typeof window.alloy);
-      console.log('[DEBUG] window.alloy.q:', window.alloy?.q);
 
-      // Wait for real alloy to replace stub
+      // Wait for the IIFE to replace the stub
+      // Real alloy.q will be drained and deleted when the real SDK initializes
+      let pollCount = 0;
       const check = setInterval(() => {
+        pollCount += 1;
+        const alloyExists = !!window.alloy;
         const alloyType = typeof window.alloy;
-        const hasQ = !!window.alloy?.q;
+        const hasQ = window.alloy?.q !== undefined;
 
-        console.log('[DEBUG] Poll: alloy type =', alloyType, ', has .q =', hasQ);
+        console.log(`[DEBUG] Poll #${pollCount}: alloy exists=${alloyExists}, type=${alloyType}, has .q=${hasQ}`);
 
-        if (window.alloy && alloyType === 'function' && !hasQ) {
-          console.log('[DEBUG] Real alloy detected! Configuring...');
+        // Real alloy: is a function AND .q is gone (stub drained the queue)
+        if (alloyExists && alloyType === 'function' && !hasQ) {
           clearInterval(check);
+          console.log('[DEBUG] Real alloy detected! Calling configure...');
 
           try {
+            // Don't await this—alloy('configure') queues itself if not ready
             window.alloy('configure', {
               datastreamId: DATASTREAM_ID,
               orgId: ORG_ID,
               defaultConsent: 'in',
               renderDecisions: false,
             });
-            console.log('[DEBUG] configure() call sent to alloy');
-            window.alloy.configured = true;
-            console.log('[SUCCESS] Alloy configured successfully!');
+
+            console.log('[SUCCESS] configure() queued successfully');
             resolve();
           } catch (err) {
-            console.error('[ERROR] configure() failed:', err);
+            console.error('[ERROR] configure() threw:', err);
             resolve(); // Still resolve to not block the page
           }
         }
-      }, 50);
+      }, 100);
 
-      // Timeout fallback
+      // Timeout: give up after 5 seconds
       setTimeout(() => {
         clearInterval(check);
-        console.warn('[DEBUG] Timeout waiting for alloy, resolving anyway');
-        resolve();
-      }, 3000);
+        console.warn('[WARNING] Timeout: alloy still not ready, giving up');
+        console.warn('[WARNING] Current state: window.alloy.q =', window.alloy?.q);
+        resolve(); // Resolve anyway so page doesn't hang
+      }, 5000);
     });
 
     script.addEventListener('error', (err) => {
-      console.error('[ERROR] Script failed to load:', err);
-      reject(new Error('[Alloy] Failed to load alloy.js'));
+      console.error('[ERROR] Script load failed:', err);
+      reject(new Error('[Alloy] Failed to load from CDN'));
     });
 
     document.head.appendChild(script);
-    console.log('[DEBUG] Script tag appended to head');
+    console.log('[DEBUG] Script tag added to head');
   });
 }
