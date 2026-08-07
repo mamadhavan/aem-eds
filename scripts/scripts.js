@@ -96,8 +96,8 @@ async function configureAlloy() {
 
   // Step 4: Configure alloy with your Datastream ID and Org ID
   await window.alloy('configure', {
-    datastreamId: 'YOUR_ACTUAL_DATASTREAM_ID',
-    orgId: 'YOUR_ACTUAL_ORG_ID@AdobeOrg',
+    datastreamId: '3f75f0f0-4f07-482b-930a-8ef876cf2853',
+    orgId: 'E71EADC8584130D00A495EBD@AdobeOrg',
     defaultConsent: 'in',
     renderDecisions: false,
   });
