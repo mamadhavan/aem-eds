@@ -67,50 +67,54 @@ async function loadFonts() {
  * Uses EDS loadScript to handle nonce-based CSP automatically.
  */
 async function configureAlloy() {
-  // Step 1: Define queue stub before script loads
-  await new Promise((resolve,reject) => {
-    if(document.querySelector('script[src*="alloy.min.js"]')) {
-    resolve();
-    return;
+  // Step 1: Load the alloy script if not already present
+  await new Promise((resolve, reject) => {
+    if (document.querySelector('script[src*="alloy.min.js"]')) {
+      resolve();
+      return;
     }
+
     const script = document.createElement('script');
     script.src = `${window.hlx.codeBasePath}/scripts/alloy.min.js`;
-    script.onload = () => {
-      console.log('script loaded',typeof window.alloy);
-      console.log('script loaded alloy p',window.alloy?.p);
+
+    script.addEventListener('load', () => {
       resolve();
-    };
-    script.onerror() = () => reject(new Error("script failed to load"));
+    });
+
+    script.addEventListener('error', () => {
+      reject(new Error('[Alloy] script failed to load'));
+    });
+
     document.head.appendChild(script);
   });
+
+  // Step 2: Wait for alloy to be available
   await new Promise((resolve) => {
     const check = setInterval(() => {
-      if (window.alloy && typeof window.alloy === 'function' && !window.alloy.q) {
+      if (window.alloy && typeof window.alloy === 'function') {
         clearInterval(check);
-        console.log('[Alloy] window.alloy is available');
         resolve();
       }
     }, 50);
+
     setTimeout(() => {
       clearInterval(check);
-      console.error('[Alloy] window.alloy is not available after loadScript()');
+      console.warn('[Alloy] timeout waiting for alloy to become available');
       resolve();
     }, 3000);
   });
 
-  // Step 4: Configure alloy with your Datastream ID and Org ID
+  // Step 3: Configure
   try {
-  await window.alloy('configure', {
-    datastreamId: '3f75f0f0-4f07-482b-930a-8ef876cf2853',
-    orgId: 'E71EADC8584130D00A495EBD@AdobeOrg',
-    defaultConsent: 'in',
-    renderDecisions: false,
-  });
-  console.log('[Alloy] window.alloy is configured');
-  } catch(err){
-    console.error('alloy config failed', err)
+    await window.alloy('configure', {
+      datastreamId: 'YOUR_ACTUAL_DATASTREAM_ID',
+      orgId: 'YOUR_ACTUAL_ORG_ID@AdobeOrg',
+      defaultConsent: 'in',
+      renderDecisions: false,
+    });
+  } catch (err) {
+    console.error('[Alloy] configure failed:', err);
   }
-
 }
 
 /**
