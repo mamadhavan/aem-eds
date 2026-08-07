@@ -1,37 +1,22 @@
-import loadAlloy from './alloy-setup.js';
-
-let cachedPropositions = null;
-
+/**
+ * Fetch Target propositions directly from Edge Network API
+ * No SDK needed — just direct HTTP calls
+ */
 export async function getTargetPropositions(scopes = []) {
+  const DATASTREAM_ID = '3f75f0f0-4f07-482b-930a-8ef876cf2853';
+  const ORG_ID = 'E71EADC8584130D00A495EBD@AdobeOrg';
+
   console.log('[DEBUG] getTargetPropositions called with scopes:', scopes);
 
-  if (cachedPropositions) {
-    console.log('[DEBUG] Returning cached propositions:', cachedPropositions);
-    return cachedPropositions;
-  }
-
-  console.log('[DEBUG] Loading alloy...');
-  try {
-    await loadAlloy();
-    console.log('[DEBUG] Alloy loaded successfully');
-  } catch (e) {
-    console.error('[ERROR] Failed to load alloy:', e);
+  if (!scopes.length) {
+    console.warn('[WARNING] No scopes provided');
     return [];
   }
 
-  if (typeof window.alloy !== 'function') {
-    console.error('[ERROR] window.alloy is not a function. Type:', typeof window.alloy);
-    return [];
-  }
+  const url = `https://edge.adobedc.net/ee/v2/interact?datastreamId=${DATASTREAM_ID}`;
 
-  console.log('[DEBUG] Calling window.alloy(sendEvent)...');
-
-  try {
-    const result = await window.alloy('sendEvent', {
-      renderDecisions: false,
-      personalization: {
-        decisionScopes: scopes,
-      },
+  const payload = {
+    event: {
       xdm: {
         eventType: 'web.webpagedetails.pageViews',
         web: {
@@ -40,55 +25,117 @@ export async function getTargetPropositions(scopes = []) {
             URL: window.location.href,
           },
         },
+        _experience: {
+          decisioning: {
+            propositionDisplay: {},
+          },
+        },
       },
+    },
+    query: {
+      personalization: {
+        decisionScopes: scopes,
+      },
+    },
+  };
+
+  console.log('[DEBUG] Sending request to Edge Network:', url);
+  console.log('[DEBUG] Payload:', payload);
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Include cookies for ECID
+      body: JSON.stringify(payload),
     });
 
-    console.log('[DEBUG] sendEvent response:', result);
-    cachedPropositions = result?.propositions || [];
-    console.log('[SUCCESS] Got propositions:', cachedPropositions);
-    return cachedPropositions;
+    console.log('[DEBUG] Response status:', response.status);
+
+    if (!response.ok) {
+      console.error('[ERROR] Edge Network returned:', response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    console.log('[DEBUG] Edge Network response:', data);
+
+    // Extract propositions from response
+    const propositions = data?.handle?.reduce((acc, item) => {
+      if (item.type === 'personalization:decisions') {
+        acc.push(...(item.payload || []));
+      }
+      return acc;
+    }, []) || [];
+
+    console.log('[DEBUG] Extracted propositions:', propositions);
+    return propositions;
   } catch (err) {
-    console.error('[ERROR] sendEvent failed:', err);
+    console.error('[ERROR] Edge Network request failed:', err);
     return [];
   }
 }
 
 export function notifyDisplay(propositions) {
-  console.log('[DEBUG] notifyDisplay called with propositions:', propositions);
+  console.log('[DEBUG] notifyDisplay called');
 
   if (!propositions?.length) {
-    console.log('[DEBUG] No propositions to display');
     return;
   }
 
-  window.alloy('sendEvent', {
-    xdm: {
-      eventType: '_experience.decisioning.propositionDisplay',
-      _experience: {
-        decisioning: { propositions },
+  const DATASTREAM_ID = '3f75f0f0-4f07-482b-930a-8ef876cf2853';
+  const url = `https://edge.adobedc.net/ee/v2/interact?datastreamId=${DATASTREAM_ID}`;
+
+  const payload = {
+    event: {
+      xdm: {
+        eventType: '_experience.decisioning.propositionDisplay',
+        _experience: {
+          decisioning: {
+            propositions,
+          },
+        },
       },
     },
-  });
+  };
 
-  console.log('[DEBUG] Display notification sent');
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  }).catch(err => console.error('[ERROR] notifyDisplay failed:', err));
 }
 
 export function notifyClick(propositions) {
-  console.log('[DEBUG] notifyClick called with propositions:', propositions);
+  console.log('[DEBUG] notifyClick called');
 
   if (!propositions?.length) {
-    console.log('[DEBUG] No propositions to click');
     return;
   }
 
-  window.alloy('sendEvent', {
-    xdm: {
-      eventType: '_experience.decisioning.propositionInteract',
-      _experience: {
-        decisioning: { propositions },
+  const DATASTREAM_ID = '3f75f0f0-4f07-482b-930a-8ef876cf2853';
+  const url = `https://edge.adobedc.net/ee/v2/interact?datastreamId=${DATASTREAM_ID}`;
+
+  const payload = {
+    event: {
+      xdm: {
+        eventType: '_experience.decisioning.propositionInteract',
+        _experience: {
+          decisioning: {
+            propositions,
+          },
+        },
       },
     },
-  });
+  };
 
-  console.log('[DEBUG] Click notification sent');
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  }).catch(err => console.error('[ERROR] notifyClick failed:', err));
 }
