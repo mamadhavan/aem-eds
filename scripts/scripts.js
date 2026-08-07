@@ -12,6 +12,7 @@ import {
   loadCSS,
 } from './aem.js';
 import initSidekickActions from './sidekick-actions.js';
+import { getTargetPropositions } from './target.js';
 
 /**
  * Moves all the attributes from a given elmenet to another given element.
@@ -91,10 +92,23 @@ export function decorateMain(main) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
+
+  console.log('[DEBUG] loadEager() started');
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
+  // Call getTargetPropositions early
+  console.log('[DEBUG] About to fetch Target propositions');
+  try {
+    window.targetPropositions = await getTargetPropositions(['personalized-text']);
+    console.log('[DEBUG] Target propositions fetched:', window.targetPropositions);
+  } catch (e) {
+    console.error('[ERROR] Target propositions failed:', e);
+    window.targetPropositions = [];
+  }
+
   const main = doc.querySelector('main');
   if (main) {
+    console.log('[DEBUG] Found main element, decorating...');
     decorateMain(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);

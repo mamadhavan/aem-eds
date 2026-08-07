@@ -1,49 +1,55 @@
 import { getTargetPropositions, notifyDisplay, notifyClick } from '../../scripts/target.js';
 
 export default async function decorate(block) {
-  // Parse the authored config from the first row
+  console.log('[DEBUG] promo.js decorate() called');
+  console.log('[DEBUG] block element:', block);
+
   const rows = [...block.children];
+  console.log('[DEBUG] block rows:', rows);
+
   const configRow = rows[0];
   const fallbackRow = rows[1];
 
-  // Extract decision scope from first cell of config row
   const decisionScope = configRow?.textContent?.trim();
+  console.log('[DEBUG] Decision scope from config:', decisionScope);
 
-  // Remove the config row from DOM (it's metadata, not content)
   if (configRow) configRow.remove();
 
-  // If no scope configured, just leave fallback visible
   if (!decisionScope) {
+    console.warn('[WARNING] No decision scope configured, showing fallback');
     return;
   }
 
-  // Show fallback immediately (good for LCP, no layout shift)
   if (fallbackRow) {
     fallbackRow.style.opacity = '1';
+    console.log('[DEBUG] Fallback row made visible');
   }
 
   try {
-    // Fetch Target propositions for this scope
+    console.log('[DEBUG] Fetching Target propositions...');
     const propositions = await getTargetPropositions([decisionScope]);
+    console.log('[DEBUG] Got propositions:', propositions);
 
-    // Find the proposition matching this scope
     const matchedProposition = propositions.find((p) => p.scope === decisionScope);
+    console.log('[DEBUG] Matched proposition:', matchedProposition);
 
     if (!matchedProposition || !matchedProposition.items?.length) {
-      // No personalization content; fallback stays visible
+      console.warn('[WARNING] No matching proposition found');
       return;
     }
 
     const contentItem = matchedProposition.items[0].data?.content;
+    console.log('[DEBUG] Content item from Target:', contentItem);
 
     if (!contentItem) {
+      console.warn('[WARNING] No content in proposition');
       return;
     }
 
-    // Extract fields from Target's JSON response
     const { headline, subheading, body, ctaLabel, ctaUrl, imageUrl } = contentItem;
+    console.log('[DEBUG] Parsed content:', { headline, subheading, body, ctaLabel, ctaUrl, imageUrl });
 
-    // Clear fallback and render personalized content
+    // Clear and render
     block.innerHTML = `
       <div class="promo-personalized">
         ${imageUrl ? `<img src="${imageUrl}" alt="Promo" />` : ''}
@@ -53,19 +59,21 @@ export default async function decorate(block) {
         ${ctaUrl ? `<a href="${ctaUrl}" class="button">${ctaLabel || 'Learn More'}</a>` : ''}
       </div>
     `;
+    console.log('[DEBUG] DOM updated with Target content');
 
-    // Notify Target that we displayed this proposition (impression tracking)
+    // Track display
     notifyDisplay([matchedProposition]);
 
-    // Track clicks if there's a CTA
+    // Track clicks
     if (ctaUrl) {
       const ctaElement = block.querySelector('a.button');
       ctaElement?.addEventListener('click', () => {
+        console.log('[DEBUG] CTA clicked');
         notifyClick([matchedProposition]);
       });
+      console.log('[DEBUG] Click listener attached to CTA');
     }
   } catch (err) {
-    console.error('Failed to fetch Target propositions:', err);
-    // Fallback content stays visible if something goes wrong
+    console.error('[ERROR] Failed to fetch Target propositions:', err);
   }
 }

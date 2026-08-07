@@ -2,35 +2,35 @@ import loadAlloy from './alloy-setup.js';
 
 let cachedPropositions = null;
 
-/**
- * Fetch personalization propositions from Target via Edge Network.
- * @param {Array<string>} scopes - Decision scope names (e.g., ['hero-banner'])
- * @returns {Promise<Array>} Array of proposition objects
- */
 export async function getTargetPropositions(scopes = []) {
+  console.log('[DEBUG] getTargetPropositions called with scopes:', scopes);
+
   if (cachedPropositions) {
+    console.log('[DEBUG] Returning cached propositions:', cachedPropositions);
     return cachedPropositions;
   }
 
-  // Ensure alloy is loaded and configured
+  console.log('[DEBUG] Loading alloy...');
   try {
     await loadAlloy();
+    console.log('[DEBUG] Alloy loaded successfully');
   } catch (e) {
-    console.error('Failed to load alloy:', e);
+    console.error('[ERROR] Failed to load alloy:', e);
     return [];
   }
 
   if (typeof window.alloy !== 'function') {
-    console.error('[Target] window.alloy is not available');
+    console.error('[ERROR] window.alloy is not a function. Type:', typeof window.alloy);
     return [];
   }
 
+  console.log('[DEBUG] Calling window.alloy(sendEvent)...');
+
   try {
-    // Send event to Edge Network, requesting personalization for given scopes
     const result = await window.alloy('sendEvent', {
-      renderDecisions: false, // We render manually in blocks
+      renderDecisions: false,
       personalization: {
-        decisionScopes: scopes, // e.g., ['hero-banner']
+        decisionScopes: scopes,
       },
       xdm: {
         eventType: 'web.webpagedetails.pageViews',
@@ -43,21 +43,21 @@ export async function getTargetPropositions(scopes = []) {
       },
     });
 
-    // Extract propositions from response
+    console.log('[DEBUG] sendEvent response:', result);
     cachedPropositions = result?.propositions || [];
+    console.log('[SUCCESS] Got propositions:', cachedPropositions);
     return cachedPropositions;
   } catch (err) {
-    console.error('[Target] sendEvent failed:', err);
+    console.error('[ERROR] sendEvent failed:', err);
     return [];
   }
 }
 
-/**
- * Notify Target that a proposition was displayed (impression tracking).
- * @param {Array} propositions - The proposition objects that were rendered
- */
 export function notifyDisplay(propositions) {
+  console.log('[DEBUG] notifyDisplay called with propositions:', propositions);
+
   if (!propositions?.length) {
+    console.log('[DEBUG] No propositions to display');
     return;
   }
 
@@ -69,14 +69,15 @@ export function notifyDisplay(propositions) {
       },
     },
   });
+
+  console.log('[DEBUG] Display notification sent');
 }
 
-/**
- * Notify Target that a user interacted with (clicked) an offer.
- * @param {Array} propositions - The proposition objects that were clicked
- */
 export function notifyClick(propositions) {
+  console.log('[DEBUG] notifyClick called with propositions:', propositions);
+
   if (!propositions?.length) {
+    console.log('[DEBUG] No propositions to click');
     return;
   }
 
@@ -88,4 +89,6 @@ export function notifyClick(propositions) {
       },
     },
   });
+
+  console.log('[DEBUG] Click notification sent');
 }
