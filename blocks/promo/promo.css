@@ -1,23 +1,43 @@
-/* blocks/promo/promo.css */
-.text-block {
+.promo {
   padding: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
 }
 
-.text-block h2 {
-  font-size: 2rem;
+.promo img {
+  max-width: 100%;
+  height: auto;
   margin-bottom: 1rem;
 }
 
-.text-block p {
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
+.promo h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
 }
 
-.text-block a.button {
+.promo h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #666;
+}
+
+.promo p {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.promo a.button {
   display: inline-block;
   padding: 0.75rem 1.5rem;
   background-color: #1473e6;
   color: #fff;
   border-radius: 4px;
   text-decoration: none;
+  font-weight: 600;
+}
+
+.promo a.button:hover {
+  background-color: #0d5fbf;
 }

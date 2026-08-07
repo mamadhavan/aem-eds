@@ -1,26 +1,36 @@
+import loadAlloy from './alloy-setup.js';
+
 let cachedPropositions = null;
 
 /**
- * Sends a request to Adobe Edge Network (Adobe Target) for personalization propositions.
- * @param {Array<string>} scopes Array of decision scopes (e.g. ['personalized-text'])
- * @returns {Promise<Array>} Array of propositions returned by Target
+ * Fetch personalization propositions from Target via Edge Network.
+ * @param {Array<string>} scopes - Decision scope names (e.g., ['hero-banner'])
+ * @returns {Promise<Array>} Array of proposition objects
  */
 export async function getTargetPropositions(scopes = []) {
   if (cachedPropositions) {
     return cachedPropositions;
   }
 
-  // Ensure window.alloy is available (configured in scripts.js)
+  // Ensure alloy is loaded and configured
+  try {
+    await loadAlloy();
+  } catch (e) {
+    console.error('Failed to load alloy:', e);
+    return [];
+  }
+
   if (typeof window.alloy !== 'function') {
     console.error('[Target] window.alloy is not available');
     return [];
   }
 
   try {
+    // Send event to Edge Network, requesting personalization for given scopes
     const result = await window.alloy('sendEvent', {
-      renderDecisions: false,
+      renderDecisions: false, // We render manually in blocks
       personalization: {
-        decisionScopes: scopes,
+        decisionScopes: scopes, // e.g., ['hero-banner']
       },
       xdm: {
         eventType: 'web.webpagedetails.pageViews',
@@ -33,6 +43,7 @@ export async function getTargetPropositions(scopes = []) {
       },
     });
 
+    // Extract propositions from response
     cachedPropositions = result?.propositions || [];
     return cachedPropositions;
   } catch (err) {
@@ -42,13 +53,14 @@ export async function getTargetPropositions(scopes = []) {
 }
 
 /**
- * Notifies Adobe Target that an offer was displayed (required for impression reporting).
- * @param {Array} propositions Array of proposition objects that were rendered
+ * Notify Target that a proposition was displayed (impression tracking).
+ * @param {Array} propositions - The proposition objects that were rendered
  */
 export function notifyDisplay(propositions) {
   if (!propositions?.length) {
     return;
   }
+
   window.alloy('sendEvent', {
     xdm: {
       eventType: '_experience.decisioning.propositionDisplay',
@@ -60,13 +72,14 @@ export function notifyDisplay(propositions) {
 }
 
 /**
- * Notifies Adobe Target that a user interacted with/clicked an offer (for conversion goals).
- * @param {Array} propositions Array of proposition objects that were clicked
+ * Notify Target that a user interacted with (clicked) an offer.
+ * @param {Array} propositions - The proposition objects that were clicked
  */
 export function notifyClick(propositions) {
   if (!propositions?.length) {
     return;
   }
+
   window.alloy('sendEvent', {
     xdm: {
       eventType: '_experience.decisioning.propositionInteract',
