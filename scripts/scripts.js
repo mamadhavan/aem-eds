@@ -68,7 +68,7 @@ async function loadFonts() {
  */
 async function configureAlloy() {
   // Step 1: Define queue stub before script loads
-  await loadScript('./alloy.min.js');
+  await loadScript(`${window.hlx.codeBasePath}/scripts/alloy.min.js`);
   await new Promise((resolve) => {
     const check = setInterval(() => {
       if (window.alloy && typeof window.alloy === 'function' && !window.alloy.q) {
