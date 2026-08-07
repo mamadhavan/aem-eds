@@ -67,8 +67,15 @@ async function loadFonts() {
  * Uses EDS loadScript to handle nonce-based CSP automatically.
  */
 async function configureAlloy() {
-  // Step 1: Load the alloy script if not already present
-  await new Promise((resolve, reject) => {
+  // Step 1: Define queue stub before injecting the script.
+  // This is critical — alloy.min.js looks for this stub on load.
+  window.alloy = window.alloy || function alloy(...args) {
+    (window.alloy.q = window.alloy.q || []).push(args);
+  };
+  window.alloy.q = window.alloy.q || [];
+
+  // Step 2: Inject script tag
+  await new Promise((resolve) => {
     if (document.querySelector('script[src*="alloy.min.js"]')) {
       resolve();
       return;
@@ -82,16 +89,18 @@ async function configureAlloy() {
     });
 
     script.addEventListener('error', () => {
-      reject(new Error('[Alloy] script failed to load'));
+      console.error('[Alloy] script failed to load');
+      resolve();
     });
 
     document.head.appendChild(script);
   });
 
-  // Step 2: Wait for alloy to be available
+  // Step 3: Wait for real alloy to replace the stub.
+  // Real alloy replaces the stub and removes the .q property.
   await new Promise((resolve) => {
     const check = setInterval(() => {
-      if (window.alloy && typeof window.alloy === 'function') {
+      if (window.alloy && !window.alloy.q) {
         clearInterval(check);
         resolve();
       }
@@ -99,12 +108,17 @@ async function configureAlloy() {
 
     setTimeout(() => {
       clearInterval(check);
-      console.warn('[Alloy] timeout waiting for alloy to become available');
+      console.warn('[Alloy] timeout — alloy.q still exists:', window.alloy?.q);
       resolve();
     }, 3000);
   });
 
-  // Step 3: Configure
+  // Step 4: Configure
+  if (typeof window.alloy !== 'function') {
+    console.error('[Alloy] alloy still not a function after load');
+    return;
+  }
+
   try {
     await window.alloy('configure', {
       datastreamId: 'YOUR_ACTUAL_DATASTREAM_ID',
