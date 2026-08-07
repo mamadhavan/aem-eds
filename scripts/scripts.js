@@ -13,7 +13,7 @@ import {
 } from './aem.js';
 import initSidekickActions from './sidekick-actions.js';
 import initDamArchive from './sidekick-action1.js';
-import {getTargetPropositions} from './target.js';
+import { getTargetPropositions } from './target.js';
 
 console.log('script file loaded');
 /**
@@ -94,20 +94,15 @@ export function decorateMain(main) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  console.log('[DEBUG] loadEager started');
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
- console.log('[DEBUG] About to call getTargetProposition');
-  try {
-  window.targetPropositions = await getTargetPropositions([
-        'personalized-text',
-      ]);
-      console.log('[DEBUG] target propostions result', window.targetPropositions);
-  } catch(e){
-     console.error('target failed to load', e);
-     window.targetPropositions=[];
-  }
 
+  try {
+    window.targetPropositions = await getTargetPropositions(['personalized-text']);
+  } catch (e) {
+    console.error('target failed to load', e);
+    window.targetPropositions = [];
+  }
 
   const main = doc.querySelector('main');
   if (main) {
