@@ -1,22 +1,45 @@
 /**
- * Fetch Target propositions directly from Edge Network API
- * No SDK needed — just direct HTTP calls
+ * Target integration using alloy.js Web SDK
+ * Fetches personalization propositions from Target
+ */
+
+import loadAlloy from './alloy-setup.js';
+
+let cachedPropositions = null;
+
+/**
+ * Fetch Target propositions for given scopes
+ * @param {Array<string>} scopes - Decision scopes to request
+ * @returns {Promise<Array>} Propositions from Target
  */
 export async function getTargetPropositions(scopes = []) {
-  const DATASTREAM_ID = '3f75f0f0-4f07-482b-930a-8ef876cf2853';
-  const ORG_ID = 'E71EADC8584130D00A495EBD@AdobeOrg';
+  console.log('[TARGET] getTargetPropositions called with scopes:', scopes);
 
-  console.log('[DEBUG] getTargetPropositions called with scopes:', scopes);
+  if (cachedPropositions) {
+    console.log('[TARGET] Returning cached propositions');
+    return cachedPropositions;
+  }
 
-  if (!scopes.length) {
-    console.warn('[WARNING] No scopes provided');
+  try {
+    console.log('[TARGET] Loading alloy...');
+    await loadAlloy();
+  } catch (err) {
+    console.error('[TARGET] Failed to load alloy:', err);
     return [];
   }
 
-  const url = `https://edge.adobedc.net/ee/v2/interact?datastreamId=${DATASTREAM_ID}`;
+  if (typeof window.alloy !== 'function') {
+    console.error('[TARGET] window.alloy is not available');
+    return [];
+  }
 
-  const payload = {
-    event: {
+  try {
+    console.log('[TARGET] Sending event to Target with scopes:', scopes);
+    const result = await window.alloy('sendEvent', {
+      renderDecisions: false,
+      personalization: {
+        decisionScopes: scopes,
+      },
       xdm: {
         eventType: 'web.webpagedetails.pageViews',
         web: {
@@ -25,78 +48,35 @@ export async function getTargetPropositions(scopes = []) {
             URL: window.location.href,
           },
         },
-        _experience: {
-          decisioning: {
-            propositionDisplay: {},
-          },
-        },
       },
-    },
-    query: {
-      personalization: {
-        decisionScopes: scopes,
-      },
-    },
-  };
-
-  console.log('[DEBUG] Sending request to Edge Network:', url);
-  console.log('[DEBUG] Payload:', payload);
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include', // Include cookies for ECID
-      body: JSON.stringify(payload),
     });
 
-    console.log('[DEBUG] Response status:', response.status);
+    console.log('[TARGET] Response from Target:', result);
 
-    if (!response.ok) {
-      console.error('[ERROR] Edge Network returned:', response.status);
-      return [];
-    }
+    cachedPropositions = result?.propositions || [];
+    console.log('[TARGET] Cached propositions:', cachedPropositions);
 
-    const data = await response.json();
-    console.log('[DEBUG] Full Edge Network response:', JSON.stringify(data, null, 2));
-
-     // Log each item in the handle array
-    if (data?.handle) {
-      data.handle.forEach((item, index) => {
-        console.log(`[DEBUG] Handle item ${index}:`, item);
-      });
-    }
-
-    // Extract propositions from response
-    const propositions = data?.handle?.reduce((acc, item) => {
-      if (item.type === 'personalization:decisions') {
-        acc.push(...(item.payload || []));
-      }
-      return acc;
-    }, []) || [];
-
-    console.log('[DEBUG] Extracted propositions:', propositions);
-    return propositions;
+    return cachedPropositions;
   } catch (err) {
-    console.error('[ERROR] Edge Network request failed:', err);
+    console.error('[TARGET] sendEvent failed:', err);
     return [];
   }
 }
 
+/**
+ * Send display notification to Target
+ * @param {Array} propositions - Propositions to track
+ */
 export function notifyDisplay(propositions) {
-  console.log('[DEBUG] notifyDisplay called');
+  console.log('[TARGET] notifyDisplay called');
 
   if (!propositions?.length) {
+    console.log('[TARGET] No propositions to track');
     return;
   }
 
-  const DATASTREAM_ID = '3f75f0f0-4f07-482b-930a-8ef876cf2853';
-  const url = `https://edge.adobedc.net/ee/v2/interact?datastreamId=${DATASTREAM_ID}`;
-
-  const payload = {
-    event: {
+  try {
+    window.alloy('sendEvent', {
       xdm: {
         eventType: '_experience.decisioning.propositionDisplay',
         _experience: {
@@ -105,29 +85,28 @@ export function notifyDisplay(propositions) {
           },
         },
       },
-    },
-  };
+    });
 
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify(payload),
-  }).catch(err => console.error('[ERROR] notifyDisplay failed:', err));
+    console.log('[TARGET] Display notification sent');
+  } catch (err) {
+    console.error('[TARGET] notifyDisplay error:', err);
+  }
 }
 
+/**
+ * Send click notification to Target
+ * @param {Array} propositions - Propositions to track
+ */
 export function notifyClick(propositions) {
-  console.log('[DEBUG] notifyClick called');
+  console.log('[TARGET] notifyClick called');
 
   if (!propositions?.length) {
+    console.log('[TARGET] No propositions to track');
     return;
   }
 
-  const DATASTREAM_ID = '3f75f0f0-4f07-482b-930a-8ef876cf2853';
-  const url = `https://edge.adobedc.net/ee/v2/interact?datastreamId=${DATASTREAM_ID}`;
-
-  const payload = {
-    event: {
+  try {
+    window.alloy('sendEvent', {
       xdm: {
         eventType: '_experience.decisioning.propositionInteract',
         _experience: {
@@ -136,13 +115,18 @@ export function notifyClick(propositions) {
           },
         },
       },
-    },
-  };
+    });
 
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify(payload),
-  }).catch(err => console.error('[ERROR] notifyClick failed:', err));
+    console.log('[TARGET] Click notification sent');
+  } catch (err) {
+    console.error('[TARGET] notifyClick error:', err);
+  }
+}
+
+/**
+ * Clear cached propositions
+ */
+export function clearCache() {
+  cachedPropositions = null;
+  console.log('[TARGET] Cache cleared');
 }
