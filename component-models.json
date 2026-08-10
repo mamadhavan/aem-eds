@@ -227,5 +227,17 @@
     ],
     "groups": ["Content"],
     "title": "Search Block"
+  },
+  {
+    "id": "target-block",
+    "fields": [
+      {
+        "component": "text-input",
+        "name": "decisionScope",
+        "label": "Target Decision Scope",
+        "value": "my-target-scope",
+        "placeholder": "Enter Target decision scope name (e.g., hero-banner)"
+      }
+    ]
   }
 ]
