@@ -1,8 +1,3 @@
-/* export default async function loadAlloy() {
-  console.log('[DEBUG] loadAlloy called (no-op — using direct API calls instead)');
-  return Promise.resolve();
-} */
-
 /**
  * Adobe Web SDK (alloy.js) Configuration
  * Complete setup with error handling and configuration
@@ -44,20 +39,17 @@ export default function loadAlloy() {
 
       console.log('[ALLOY] Starting initialization');
 
-      // ════════════════════════════════════════════════════════════
       // STEP 1: Set up namespace
-      // ════════════════════════════════════════════════════════════
-
+      // eslint-disable-next-line no-underscore-dangle
       window.__alloyNS = window.__alloyNS || [];
+      // eslint-disable-next-line no-underscore-dangle
       if (!window.__alloyNS.includes('alloy')) {
+        // eslint-disable-next-line no-underscore-dangle
         window.__alloyNS.push('alloy');
         console.log('[ALLOY] Namespace registered');
       }
 
-      // ════════════════════════════════════════════════════════════
       // STEP 2: Create queue stub
-      // ════════════════════════════════════════════════════════════
-
       window.alloy = window.alloy || function alloy(...args) {
         console.log('[ALLOY] Queue stub called with args:', args[0]);
         (window.alloy.q = window.alloy.q || []).push(args);
@@ -66,20 +58,14 @@ export default function loadAlloy() {
       window.alloy.q = window.alloy.q || [];
       console.log('[ALLOY] Queue stub created');
 
-      // ════════════════════════════════════════════════════════════
       // STEP 3: Inject alloy script from CDN
-      // ════════════════════════════════════════════════════════════
-
       const script = document.createElement('script');
       script.src = `https://cdn1.adoberesources.net/alloy/${ALLOY_VERSION}/alloy.min.js`;
       script.async = true;
 
       console.log('[ALLOY] Script URL:', script.src);
 
-      // ════════════════════════════════════════════════════════════
       // STEP 4: Handle script load
-      // ════════════════════════════════════════════════════════════
-
       script.addEventListener('load', () => {
         console.log('[ALLOY] Script loaded from CDN');
 
@@ -100,10 +86,7 @@ export default function loadAlloy() {
             clearInterval(pollInterval);
             console.log('[ALLOY] Real alloy detected!');
 
-            // ════════════════════════════════════════════════════════════
             // STEP 5: Configure alloy
-            // ════════════════════════════════════════════════════════════
-
             try {
               console.log('[ALLOY] Configuring with datastream:', DATASTREAM_ID);
 
@@ -128,7 +111,6 @@ export default function loadAlloy() {
               console.log('[SUCCESS] ✅ Alloy configured successfully');
 
               resolve();
-
             } catch (err) {
               console.error('[ERROR] Configuration failed:', err);
               reject(err);
@@ -149,22 +131,15 @@ export default function loadAlloy() {
         }, 100);
       });
 
-      // ════════════════════════════════════════════════════════════
       // STEP 6: Handle script load error
-      // ════════════════════════════════════════════════════════════
-
       script.addEventListener('error', (err) => {
         console.error('[ERROR] Script load failed:', err);
         reject(new Error('Failed to load alloy.js from CDN'));
       });
 
-      // ════════════════════════════════════════════════════════════
       // STEP 7: Append script to head
-      // ════════════════════════════════════════════════════════════
-
       document.head.appendChild(script);
       console.log('[ALLOY] Script appended to head');
-
     } catch (err) {
       console.error('[ERROR] Unexpected error in loadAlloy:', err);
       reject(err);
@@ -181,6 +156,7 @@ export function resetAlloy() {
   console.log('[ALLOY] Resetting alloy state');
   alloyInitPromise = null;
   window.alloy = null;
+  // eslint-disable-next-line no-underscore-dangle
   window.__alloyNS = [];
 }
 
