@@ -16,6 +16,25 @@
 import loadAlloy from './alloy-setup.js';
 
 // ════════════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ════════════════════════════════════════════════════════════
+
+/**
+ * Generate unique page view ID
+ */
+function generatePageViewId() {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+/**
+ * Get connection type
+ */
+function getConnectionType() {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  return connection?.effectiveType || 'unknown';
+}
+
+// ════════════════════════════════════════════════════════════
 // CACHE MANAGEMENT
 // ════════════════════════════════════════════════════════════
 
@@ -66,27 +85,18 @@ export async function getTargetContent(scope) {
       cache.delete(scope);
     }
 
-    // ════════════════════════════════════════════════════════════
     // Load alloy
-    // ════════════════════════════════════════════════════════════
-
     console.log('[TARGET-SERVICE] Ensuring alloy is loaded...');
     await loadAlloy();
     console.log('[TARGET-SERVICE] Alloy ready');
 
-    // ════════════════════════════════════════════════════════════
     // Check alloy is available
-    // ════════════════════════════════════════════════════════════
-
     if (!window.alloy || typeof window.alloy !== 'function') {
       console.error('[TARGET-SERVICE] Alloy not available');
       return null;
     }
 
-    // ════════════════════════════════════════════════════════════
     // Send event to Target
-    // ════════════════════════════════════════════════════════════
-
     console.log('[TARGET-SERVICE] Sending event to Target...');
 
     const response = await window.alloy('sendEvent', {
@@ -119,10 +129,7 @@ export async function getTargetContent(scope) {
 
     console.log('[TARGET-SERVICE] Response received:', response);
 
-    // ════════════════════════════════════════════════════════════
     // Extract propositions
-    // ════════════════════════════════════════════════════════════
-
     const propositions = response?.propositions || [];
 
     if (!propositions.length) {
@@ -151,16 +158,12 @@ export async function getTargetContent(scope) {
 
     console.log('[TARGET-SERVICE] Content extracted:', content);
 
-    // ════════════════════════════════════════════════════════════
     // Cache result
-    // ════════════════════════════════════════════════════════════
-
     const result = { content, proposition };
     cache.set(scope, new CacheEntry(result));
     console.log('[TARGET-SERVICE] Content cached');
 
     return result;
-
   } catch (err) {
     console.error('[TARGET-SERVICE] Error:', err);
     return null;
@@ -193,7 +196,6 @@ export async function trackDisplay(proposition) {
     });
 
     console.log('[TARGET-SERVICE] Display tracked');
-
   } catch (err) {
     console.error('[TARGET-SERVICE] Display tracking failed:', err);
   }
@@ -225,7 +227,6 @@ export async function trackInteraction(proposition) {
     });
 
     console.log('[TARGET-SERVICE] Interaction tracked');
-
   } catch (err) {
     console.error('[TARGET-SERVICE] Interaction tracking failed:', err);
   }
@@ -242,6 +243,7 @@ export async function getTargetContents(scopes = []) {
   const results = {};
 
   for (const scope of scopes) {
+    // eslint-disable-next-line no-await-in-loop
     const result = await getTargetContent(scope);
     results[scope] = result;
   }
@@ -275,23 +277,4 @@ export function getCacheStats() {
   });
 
   return stats;
-}
-
-// ════════════════════════════════════════════════════════════
-// HELPER FUNCTIONS
-// ════════════════════════════════════════════════════════════
-
-/**
- * Generate unique page view ID
- */
-function generatePageViewId() {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-/**
- * Get connection type
- */
-function getConnectionType() {
-  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  return connection?.effectiveType || 'unknown';
 }
